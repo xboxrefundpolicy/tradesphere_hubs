@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – Client Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --info: #3B82F6;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 1200px; width:100%; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+        .nav .logout-btn {
+            color: var(--danger);
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav .logout-btn:hover { background: rgba(239,68,68,0.1); }
+        .hero { text-align: center; padding: 28px 0 20px; }
+        .hero h1 {
+            font-size: 32px; font-weight: 800;
+            background: linear-gradient(135deg, #fff 40%, var(--accent-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; letter-spacing: -1px;
+        }
+        .hero p { color: var(--text-secondary); font-size: 15px; max-width: 480px; margin: 8px auto 0; }
+        #authScreen {
+            max-width: 400px; margin: 30px auto; background: var(--bg-card);
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 32px 28px; box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%; padding: 14px 16px; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            color: var(--text-primary); font-size: 15px; margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%; padding: 14px; background: var(--accent-gold);
+            color: #000; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+        #dashboard { display: none; }
+        .stats {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 16px; text-align: center; transition: border 0.3s ease;
+        }
+        .stat-card:hover { border-color: var(--accent-gold); }
+        .stat-card .number { font-size: 26px; font-weight: 800; color: var(--accent-gold); }
+        .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+        }
+        .toolbar .search-box {
+            display: flex; align-items: center; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px; padding: 0 14px;
+            flex: 1; min-width: 180px; max-width: 320px;
+        }
+        .toolbar .search-box input {
+            background: transparent; border: none; padding: 10px 8px;
+            color: var(--text-primary); font-size: 14px; width: 100%;
+        }
+        .toolbar .search-box input:focus { outline: none; }
+        .toolbar .search-box .icon { color: var(--text-secondary); font-size: 16px; }
+        .toolbar .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .add-btn {
+            background: var(--accent-gold); color: #000; border: none;
+            padding: 10px 18px; border-radius: 40px; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: 0.3s ease; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .add-btn:hover { background: var(--accent-gold-hover); transform: scale(1.02); }
+        .export-btn {
+            background: rgba(255,255,255,0.06); border: 1px solid var(--border-color);
+            color: var(--text-primary); padding: 10px 16px; border-radius: 40px;
+            font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.3s ease;
+            display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .export-btn:hover { background: rgba(255,255,255,0.1); }
+        .clients-section { margin-bottom: 24px; }
+        .client-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .client-card {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 18px;
+            transition: all 0.3s ease; position: relative;
+        }
+        .client-card:hover {
+            border-color: var(--accent-gold); transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+        .client-card .status-badge {
+            position: absolute; top: 12px; right: 12px;
+            font-size: 10px; padding: 3px 10px; border-radius: 20px; font-weight: 600;
+        }
+        .client-card .status-badge.active { background: rgba(16,185,129,0.15); color: var(--success); }
+        .client-card .status-badge.inactive { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .client-card .status-badge.locked { background: rgba(245,158,11,0.15); color: var(--accent-gold); }
+        .client-card .name { font-size: 17px; font-weight: 700; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .client-card .name .date { font-size: 11px; color: var(--text-secondary); font-weight: 400; }
+        .client-card .email { color: var(--text-secondary); font-size: 13px; margin-bottom: 10px; }
+        .client-card .log-info { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .client-card .log-info .count { color: var(--accent-gold); font-weight: 600; }
+        .client-card .log-info .last-view { font-size: 11px; color: var(--text-secondary); }
+        .client-card .link-area {
+            background: var(--bg-input); border-radius: 8px; padding: 10px 12px;
+            margin: 10px 0; font-size: 12px; word-break: break-all;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        }
+        .client-card .link-area a { color: var(--accent-gold); text-decoration: none; flex: 1; }
+        .client-card .link-area a:hover { text-decoration: underline; }
+        .client-card .link-area .copy-btn {
+            background: rgba(255,255,255,0.06); border: 1px solid var(--border-color);
+            color: var(--text-secondary); padding: 4px 10px; border-radius: 6px;
+            font-size: 11px; cursor: pointer; transition: 0.3s ease; white-space: nowrap;
+        }
+        .client-card .link-area .copy-btn:hover { background: rgba(245,158,11,0.15); color: var(--accent-gold); border-color: var(--accent-gold); }
+        .client-card .actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .client-card .actions button {
+            padding: 5px 12px; border-radius: 6px; border: none;
+            font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s ease;
+        }
+        .client-card .upload-btn { background: rgba(245,158,11,0.12); color: var(--accent-gold); }
+        .client-card .upload-btn:hover { background: rgba(245,158,11,0.25); }
+        .client-card .delete-btn { background: rgba(239,68,68,0.08); color: var(--danger); }
+        .client-card .delete-btn:hover { background: rgba(239,68,68,0.2); }
+        .client-card .view-logs-btn { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+        .client-card .view-logs-btn:hover { background: rgba(255,255,255,0.1); }
+        .client-card .unlock-btn { background: rgba(245,158,11,0.12); color: var(--accent-gold); }
+        .client-card .unlock-btn:hover { background: rgba(245,158,11,0.25); }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); grid-column: 1 / -1; }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .empty-state p { font-size: 14px; }
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            justify-content: center; align-items: center; padding: 20px;
+            backdrop-filter: blur(4px); animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius); max-width: 480px; width: 100%;
+            padding: 28px 24px; box-shadow: var(--shadow); max-height: 90vh; overflow-y: auto;
+        }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .modal .subtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
+        .modal label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 4px; color: var(--text-secondary); }
+        .modal input, .modal textarea, .modal select {
+            width: 100%; padding: 11px 14px; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            color: var(--text-primary); font-size: 14px; margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus { outline: none; border-color: var(--accent-gold); }
+        .modal textarea { min-height: 60px; resize: vertical; font-family: inherit; }
+        .modal select { appearance: auto; }
+        .modal .file-upload-area {
+            border: 2px dashed var(--border-color); border-radius: 10px; padding: 20px;
+            text-align: center; cursor: pointer; margin-bottom: 14px;
+            transition: 0.3s ease; background: var(--bg-input);
+        }
+        .modal .file-upload-area:hover { border-color: var(--accent-gold); }
+        .modal .file-upload-area .icon { font-size: 28px; margin-bottom: 2px; }
+        .modal .file-upload-area p { color: var(--text-secondary); font-size: 13px; }
+        .modal .file-upload-area .browse { color: var(--accent-gold); font-weight: 600; }
+        .modal .file-info {
+            background: rgba(245,158,11,0.06); border-radius: 8px; padding: 8px 12px;
+            font-size: 13px; margin-bottom: 14px; display: none;
+            align-items: center; justify-content: space-between;
+        }
+        .modal .file-info.visible { display: flex; }
+        .modal .file-info .remove { color: var(--danger); cursor: pointer; }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 4px; }
+        .modal .btn-group .submit-btn {
+            flex: 1; padding: 12px; background: var(--accent-gold);
+            color: #000; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s ease;
+        }
+        .modal .btn-group .submit-btn:hover { background: var(--accent-gold-hover); }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px; background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color); color: var(--text-primary);
+            border-radius: 10px; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: 0.3s ease;
+        }
+        .modal .btn-group .cancel-btn:hover { background: rgba(255,255,255,0.1); }
+        .modal .expiry-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .modal .expiry-group select { flex: 2; min-width: 120px; margin-bottom: 14px; }
+        #clientView {
+            display: none; max-width: 720px; margin: 20px auto;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 32px 28px; box-shadow: var(--shadow);
+        }
+        #clientView .lock-icon { font-size: 48px; margin-bottom: 12px; text-align: center; }
+        #clientView .lock-icon.unlocked { font-size: 48px; margin-bottom: 12px; text-align: center; }
+        #clientView h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; text-align: center; }
+        #clientView .subtitle { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #clientView .client-name { color: var(--accent-gold); font-weight: 600; }
+        #clientView .client-email { color: var(--text-secondary); font-size: 13px; text-align: center; margin-bottom: 4px; }
+        #clientView .login-meta {
+            font-size: 12px; color: var(--text-secondary); margin: 12px 0 16px;
+            padding: 10px; background: var(--bg-input); border-radius: 8px;
+            display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;
+        }
+        #clientView .login-meta span { display: flex; align-items: center; gap: 4px; }
+        #clientView input {
+            width: 100%; padding: 14px 16px; background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 10px;
+            color: var(--text-primary); font-size: 15px; margin-bottom: 12px;
+            transition: border 0.3s ease;
+        }
+        #clientView input:focus { outline: none; border-color: var(--accent-gold); }
+        #clientView input:disabled { opacity: 0.5; }
+        #clientView .view-btn {
+            width: 100%; padding: 14px; background: var(--accent-gold);
+            color: #000; border: none; border-radius: 10px;
+            font-weight: 700; font-size: 16px; cursor: pointer; transition: 0.3s ease;
+        }
+        #clientView .view-btn:hover:not(:disabled) { background: var(--accent-gold-hover); }
+        #clientView .view-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #clientView .error-msg { color: var(--danger); font-size: 13px; margin-top: 10px; display: none; }
+        #clientView .attempts-info { font-size: 13px; color: var(--text-secondary); margin-top: 10px; text-align: center; }
+        #clientView .attempts-info .warn { color: var(--danger); }
+        #clientView .attempts-info .safe { color: var(--success); }
+        #clientView .log-content { margin-top: 20px; padding: 0; display: none; background: transparent; font-size: 14px; font-family: inherit; }
+        #clientView .log-content .delivery-card {
+            background: var(--bg-input); border-radius: 12px; padding: 24px;
+            border-left: 4px solid var(--accent-gold); margin-bottom: 16px;
+        }
+        #clientView .log-content .delivery-card .platform-icon { font-size: 32px; margin-bottom: 8px; }
+        #clientView .log-content .delivery-card h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; color: var(--accent-gold); }
+        #clientView .log-content .delivery-card .thank-you { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+        #clientView .log-content .delivery-card .section-title { font-weight: 600; color: var(--text-primary); font-size: 15px; margin: 16px 0 8px; display: flex; align-items: center; gap: 8px; }
+        #clientView .log-content .delivery-card .detail-item { padding: 4px 0 4px 12px; border-left: 2px solid var(--border-color); margin-bottom: 4px; font-size: 14px; color: var(--text-secondary); }
+        #clientView .log-content .delivery-card .detail-item strong { color: var(--text-primary); }
+        #clientView .log-content .delivery-card .quality-box { background: rgba(16,185,129,0.06); border-radius: 8px; padding: 12px 16px; margin: 12px 0; border-left: 3px solid var(--success); }
+        #clientView .log-content .delivery-card .quality-box p { color: var(--text-secondary); font-size: 13px; margin: 2px 0; }
+        #clientView .log-content .delivery-card .rules-box { background: rgba(239,68,68,0.04); border-radius: 8px; padding: 16px 18px; margin: 16px 0; border-left: 3px solid var(--danger); }
+        #clientView .log-content .delivery-card .rules-box .rules-title { color: var(--danger); font-weight: 700; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        #clientView .log-content .delivery-card .rules-box .rule-item { padding: 4px 0 4px 12px; border-left: 2px solid var(--border-color); margin-bottom: 4px; font-size: 13px; color: var(--text-secondary); }
+        #clientView .log-content .delivery-card .rules-box .rule-item strong { color: var(--text-primary); }
+        #clientView .log-content .delivery-card .footer-note { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary); }
+        #clientView .log-content .delivery-card .footer-note strong { color: var(--accent-gold); }
+        #clientView .log-content .delivery-card .code-request { background: rgba(59,130,246,0.06); border-radius: 8px; padding: 12px 16px; margin: 12px 0; border-left: 3px solid var(--info); }
+        #clientView .log-content .delivery-card .code-request p { color: var(--text-secondary); font-size: 13px; }
+        #clientView .log-content .delivery-card .code-request strong { color: var(--info); }
+        .status { padding: 10px 14px; border-radius: 10px; font-size: 13px; margin: 10px 0 0; display: none; }
+        .status.visible { display: block; }
+        .status.success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); color: var(--success); }
+        .status.error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: var(--danger); }
+        .status.loading { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: var(--accent-gold); }
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; padding: 14px 24px;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; color: var(--text-primary); font-size: 14px;
+            font-weight: 500; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000; transform: translateY(100px); opacity: 0;
+            transition: all 0.4s ease; max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+        .footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border-color); text-align: center; font-size: 11px; color: var(--text-secondary); }
+        .footer a { color: var(--accent-gold); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .hero h1 { font-size: 26px; }
+            .client-grid { grid-template-columns: 1fr; }
+            .modal { padding: 20px 16px; }
+            #authScreen, #clientView { padding: 20px 16px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar .search-box { max-width: 100%; }
+            .toolbar .actions { justify-content: stretch; }
+            .add-btn, .export-btn { flex: 1; justify-content: center; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .header { flex-direction: column; align-items: flex-start; }
+            #clientView .login-meta { flex-direction: column; gap: 6px; align-items: center; }
+            #clientView .log-content .delivery-card { padding: 16px; }
+            #clientView .log-content .delivery-card .rules-box { padding: 12px 14px; }
+        }
+        @media (max-width: 480px) {
+            .stat-card .number { font-size: 22px; }
+            .client-card { padding: 14px; }
+            .client-card .link-area { font-size: 11px; flex-wrap: wrap; }
+            .modal .btn-group { flex-direction: column; }
+            .modal .btn-group .cancel-btn { padding: 10px; }
+            #clientView .log-content .delivery-card h3 { font-size: 18px; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="/tradesphere_hubs/index.html">🏠 Home</a>
+                <a class="active" href="#">📦 Portal</a>
+                <a href="/tradesphere_hubs/tracking.html">📊 Tracking</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Secure Client Log Delivery</h1>
+            <p>Upload logs, generate secure links, and track client access — all in one place.</p>
+        </section>
+
+        <div id="authScreen">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your credentials to manage clients and logs.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access Dashboard</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <div id="dashboard">
+
+            <div class="stats" id="statsBar">
+                <div class="stat-card"><div class="number" id="totalClients">0</div><div class="label">Total Clients</div></div>
+                <div class="stat-card"><div class="number" id="totalLogs">0</div><div class="label">Total Logs</div></div>
+                <div class="stat-card"><div class="number" id="activeLinks">0</div><div class="label">Active Links</div></div>
+                <div class="stat-card"><div class="number" id="recentViews">0</div><div class="label">Recent Views</div></div>
+            </div>
+
+            <div class="toolbar">
+                <div class="search-box">
+                    <span class="icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Search clients..." />
+                </div>
+                <div class="actions">
+                    <button class="export-btn" id="exportBtn">📤 Export CSV</button>
+                    <button class="add-btn" id="addClientBtn">+ Add Client</button>
+                </div>
+            </div>
+
+            <div id="clientStatus" class="status"></div>
+
+            <div class="clients-section">
+                <div class="client-grid" id="clientGrid"></div>
+            </div>
+        </div>
+
+        <div id="clientView">
+            <div class="lock-icon" id="lockIcon">🔒</div>
+            <h2>Access Your Logs</h2>
+            <div class="subtitle">Welcome, <span class="client-name" id="clientViewName">Client</span></div>
+            <div class="client-email" id="clientViewEmail"></div>
+            <div class="login-meta" id="loginMeta">
+                <span>📱 <span id="deviceInfo">Unknown Device</span></span>
+                <span>📍 <span id="locationInfo">Unknown Location</span></span>
+                <span>⏰ <span id="sessionExpiry">24h remaining</span></span>
+            </div>
+            <p style="color:var(--text-secondary); font-size:14px; margin-bottom:16px; text-align:center;">
+                Enter your password to view your account logs.
+            </p>
+            <input type="password" id="clientPassword" placeholder="Enter your password..." />
+            <button class="view-btn" id="clientViewBtn">🔓 View Logs</button>
+            <div class="error-msg" id="clientViewError">Incorrect password. Please try again.</div>
+            <div class="attempts-info" id="attemptsInfo">🔐 <span class="safe">3 attempts remaining</span></div>
+            <div class="log-content" id="logContent"></div>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h2 id="modalTitle">Add New Client</h2>
+                <div class="subtitle" id="modalSubtitle">Enter client details and upload their logs.</div>
+
+                <label>Client Name *</label>
+                <input type="text" id="clientName" placeholder="e.g., John Smith" />
+
+                <label>Client Email</label>
+                <input type="email" id="clientEmail" placeholder="e.g., john@example.com" />
+
+                <label>Password *</label>
+                <input type="text" id="clientPasswordInput" placeholder="Set a password for this client" />
+
+                <label>Log Expiry</label>
+                <div class="expiry-group">
+                    <select id="expirySelect">
+                        <option value="7">7 days</option>
+                        <option value="14" selected>14 days</option>
+                        <option value="30">30 days</option>
+                        <option value="90">90 days</option>
+                        <option value="0">Never expire</option>
+                    </select>
+                </div>
+
+                <label>Upload Log File</label>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <div class="icon">📁</div>
+                    <p>Tap to select or <span class="browse">browse</span></p>
+                    <input type="file" id="fileInput" accept=".txt,.log,.csv,.json" style="display:none" />
+                </div>
+                <div class="file-info" id="fileInfo">
+                    <span id="fileNameDisplay">file.log</span>
+                    <span class="remove" id="removeFileBtn">✕</span>
+                </div>
+
+                <div class="btn-group">
+                    <button class="submit-btn" id="modalSubmitBtn">Save Client</button>
+                    <button class="cancel-btn" id="modalCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Secure Client Log Delivery · v3.1</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- CONFIG ----------
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            const MAX_LOGIN_ATTEMPTS = 3;
+            const LOCKOUT_MINUTES = 15;
+
+            // ---------- STATE ----------
+            let isAuthenticated = false;
+            let clients = [];
+            let editingClientId = null;
+            let selectedFile = null;
+            let selectedFileName = '';
+            let searchQuery = '';
+
+            // ---------- DOM REFS ----------
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const clientView = document.getElementById('clientView');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const navDashboard = document.getElementById('navDashboard');
+            const navClients = document.getElementById('navClients');
+
+            const clientGrid = document.getElementById('clientGrid');
+            const clientStatus = document.getElementById('clientStatus');
+            const totalClients = document.getElementById('totalClients');
+            const totalLogs = document.getElementById('totalLogs');
+            const activeLinks = document.getElementById('activeLinks');
+            const recentViews = document.getElementById('recentViews');
+            const searchInput = document.getElementById('searchInput');
+
+            const addClientBtn = document.getElementById('addClientBtn');
+            const exportBtn = document.getElementById('exportBtn');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const clientName = document.getElementById('clientName');
+            const clientEmail = document.getElementById('clientEmail');
+            const clientPasswordInput = document.getElementById('clientPasswordInput');
+            const expirySelect = document.getElementById('expirySelect');
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const removeFileBtn = document.getElementById('removeFileBtn');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            const lockIcon = document.getElementById('lockIcon');
+            const clientViewName = document.getElementById('clientViewName');
+            const clientViewEmail = document.getElementById('clientViewEmail');
+            const clientPassword = document.getElementById('clientPassword');
+            const clientViewBtn = document.getElementById('clientViewBtn');
+            const clientViewError = document.getElementById('clientViewError');
+            const attemptsInfo = document.getElementById('attemptsInfo');
+            const logContent = document.getElementById('logContent');
+            const deviceInfo = document.getElementById('deviceInfo');
+            const locationInfo = document.getElementById('locationInfo');
+            const sessionExpiry = document.getElementById('sessionExpiry');
+
+            const toast = document.getElementById('toast');
+
+            // ---------- UTILITY ----------
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+            function generateLink(clientId) { return window.location.origin + window.location.pathname + '?client=' + clientId; }
+
+            function formatDate(ts) { if (!ts) return 'N/A'; return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+
+            function formatTime(ts) { if (!ts) return 'N/A'; return new Date(ts).toLocaleString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+
+            function getQueryParam(param) { const urlParams = new URLSearchParams(window.location.search); return urlParams.get(param); }
+
+            function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+            function isExpired(expiryDate) { if (!expiryDate || expiryDate === 0) return false; return Date.now() > expiryDate; }
+
+            function getExpiryDays(expiryDate) { if (!expiryDate || expiryDate === 0) return 'Never'; const diff = Math.ceil((expiryDate - Date.now()) / (1000*60*60*24)); if (diff < 0) return 'Expired'; return diff + ' days'; }
+
+            function getDeviceInfo() { const ua = navigator.userAgent; if (ua.includes('iPhone')) return 'iPhone'; if (ua.includes('iPad')) return 'iPad'; if (ua.includes('Android')) return 'Android'; if (ua.includes('Windows')) return 'Windows'; if (ua.includes('Macintosh')) return 'Mac'; return 'Unknown Device'; }
+
+            function getLocationInfo() { try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; const city = tz.split('/').pop().replace('_', ' '); return city || 'Unknown Location'; } catch { return 'Unknown Location'; } }
+
+            function showToast(message, type, duration) { type = type || 'info'; duration = duration || 3000; toast.textContent = message; toast.className = 'toast ' + type + ' visible'; clearTimeout(toast._timeout); toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, duration); }
+
+            // ---------- STORAGE ----------
+            function loadClients() {
+                try {
+                    const data = localStorage.getItem('tradesphere_clients_v3');
+                    if (data) {
+                        clients = JSON.parse(data);
+                        clients = clients.map(function(c) {
+                            if (!c.logs) c.logs = [];
+                            if (!c.createdAt) c.createdAt = Date.now();
+                            if (!c.lastView) c.lastView = null;
+                            if (!c.expiryDays) c.expiryDays = 14;
+                            if (!c.loginAttempts) c.loginAttempts = 0;
+                            if (!c.lockedUntil) c.lockedUntil = 0;
+                            if (!c.loginHistory) c.loginHistory = [];
+                            return c;
+                        });
+                    } else {
+                        clients = [{
+                            id: 'demo1',
+                            name: 'Denmark TikTok Client',
+                            email: 'demo@example.com',
+                            password: 'demo123',
+                            logs: [{
+                                id: 'log1',
+                                filename: 'tiktok_denmark_account.txt',
+                                content: `🇩🇰 TIKTOK ACCOUNT DELIVERY\n\nThank you for your purchase. Your account is ready.\n\nAccount Details\n• TikTok Login Email: demo@example.com\n• TikTok Password: demo123\n\nHow to Access\n1. Open the TikTok app\n2. Enter the email and password above\n3. DM me for verification code\n\n⚠️ STRICT RULES\n1. Use Denmark VPN before opening\n2. Wait 24 hours before using\n3. Do not change profile settings\n4. Never open recovery email\n5. Code Requests: DM me only\n\n📥 DM me when ready.`,
+                                uploadedAt: Date.now() - 86400000,
+                                views: 0,
+                                lastViewed: null
+                            }],
+                            createdAt: Date.now() - 172800000,
+                            lastView: null,
+                            expiryDays: 14,
+                            loginAttempts: 0,
+                            lockedUntil: 0,
+                            loginHistory: []
+                        }];
+                        saveClients();
+                    }
+                } catch (e) { clients = []; }
+                return clients;
+            }
+
+            function saveClients() { localStorage.setItem('tradesphere_clients_v3', JSON.stringify(clients)); }
+
+            // ---------- AUTH ----------
+            function login() {
+                var password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    clientView.style.display = 'none';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderDashboard();
+                    showToast('Welcome back!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            function logout() {
+                isAuthenticated = false;
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                clientView.style.display = 'none';
+                adminPassword.value = '';
+                var clientId = getQueryParam('client');
+                if (clientId) { window.history.pushState({}, '', window.location.pathname); }
+                showToast('Logged out successfully.', 'info');
+            }
+
+            // ---------- RENDER DASHBOARD ----------
+            function renderDashboard() {
+                loadClients();
+
+                var filteredClients = clients;
+                if (searchQuery.trim()) {
+                    var q = searchQuery.toLowerCase().trim();
+                    filteredClients = clients.filter(function(c) { return c.name.toLowerCase().includes(q) || (c.email && c.email.toLowerCase().includes(q)); });
+                }
+
+                var total = clients.length;
+                var logsCount = 0;
+                for (var i = 0; i < clients.length; i++) { logsCount += (clients[i].logs ? clients[i].logs.length : 0); }
+                var active = 0;
+                for (i = 0; i < clients.length; i++) { if (clients[i].logs && clients[i].logs.length > 0) active++; }
+                var recent = 0;
+                for (i = 0; i < clients.length; i++) { if (clients[i].lastView && (Date.now() - clients[i].lastView) < 86400000) recent++; }
+
+                totalClients.textContent = total;
+                totalLogs.textContent = logsCount;
+                activeLinks.textContent = active;
+                recentViews.textContent = recent;
+
+                if (filteredClients.length === 0) {
+                    clientGrid.innerHTML = '<div class="empty-state"><div class="icon">' + (clients.length === 0 ? '📂' : '🔍') + '</div><h3>' + (clients.length === 0 ? 'No clients yet' : 'No results found') + '</h3><p>' + (clients.length === 0 ? 'Click "Add Client" to get started.' : 'Try a different search term.') + '</p></div>';
+                    return;
+                }
+
+                var html = '';
+                for (i = 0; i < filteredClients.length; i++) {
+                    var client = filteredClients[i];
+                    var logCount = client.logs ? client.logs.length : 0;
+                    var hasExpiry = client.expiryDays && client.expiryDays > 0;
+                    var expiryDate = hasExpiry ? client.createdAt + (client.expiryDays * 86400000) : 0;
+                    var expired = hasExpiry && isExpired(expiryDate);
+                    var isLocked = client.lockedUntil && client.lockedUntil > Date.now();
+
+                    var statusClass = 'inactive';
+                    var statusText = 'No logs';
+                    if (isLocked) { statusClass = 'locked'; statusText = '🔒 Locked'; }
+                    else if (expired) { statusClass = 'inactive'; statusText = '⚠️ Expired'; }
+                    else if (logCount > 0) { statusClass = 'active'; statusText = 'Active'; }
+
+                    html += '<div class="client-card">';
+                    html += '<span class="status-badge ' + statusClass + '">' + statusText + '</span>';
+                    html += '<div class="name">' + escapeHtml(client.name) + '<span class="date">' + formatDate(client.createdAt) + '</span></div>';
+                    html += '<div class="email">' + escapeHtml(client.email || 'No email') + '</div>';
+                    html += '<div class="log-info"><span class="count">📄 ' + logCount + ' log(s)</span>';
+                    if (client.lastView) { html += '<span class="last-view">👁️ Last viewed: ' + formatTime(client.lastView) + '</span>'; }
+                    if (hasExpiry) { html += '<span class="last-view">⏳ ' + getExpiryDays(expiryDate) + '</span>'; }
+                    html += '</div>';
+                    html += '<div class="link-area"><a href="' + generateLink(client.id) + '" target="_blank">' + generateLink(client.id) + '</a><button class="copy-btn" data-link="' + generateLink(client.id) + '">📋 Copy</button></div>';
+                    html += '<div class="actions">';
+                    html += '<button class="upload-btn" data-id="' + client.id + '">📤 Upload</button>';
+                    html += '<button class="view-logs-btn" data-id="' + client.id + '">👁️ View Logs</button>';
+                    if (isLocked) { html += '<button class="unlock-btn" data-id="' + client.id + '">🔓 Unlock</button>'; }
+                    html += '<button class="delete-btn" data-id="' + client.id + '">🗑️</button>';
+                    html += '</div></div>';
+                }
+                clientGrid.innerHTML = html;
+
+                document.querySelectorAll('.upload-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() { openModal(this.dataset.id); });
+                });
+
+                document.querySelectorAll('.view-logs-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var id = this.dataset.id;
+                        var client = null;
+                        for (var j = 0; j < clients.length; j++) { if (clients[j].id === id) { client = clients[j]; break; } }
+                        if (client && client.logs && client.logs.length > 0) {
+                            var logText = '📋 LOGS FOR: ' + client.name.toUpperCase() + '\n';
+                            logText += '='.repeat(50) + '\n\n';
+                            client.logs.forEach(function(log, idx) {
+                                logText += '--- LOG ' + (idx + 1) + ': ' + log.filename + ' (' + formatDate(log.uploadedAt) + ')\n';
+                                logText += log.content + '\n\n';
+                            });
+                            alert(logText);
+                        } else { showToast('No logs found for this client.', 'error'); }
+                    });
+                });
+
+                document.querySelectorAll('.unlock-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var id = this.dataset.id;
+                        for (var j = 0; j < clients.length; j++) {
+                            if (clients[j].id === id) { clients[j].lockedUntil = 0; clients[j].loginAttempts = 0; break; }
+                        }
+                        saveClients(); renderDashboard(); showToast('Client unlocked successfully.', 'success');
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var id = this.dataset.id;
+                        var client = null;
+                        for (var j = 0; j < clients.length; j++) { if (clients[j].id === id) { client = clients[j]; break; } }
+                        if (confirm('Delete "' + (client ? client.name : 'this client') + '" and all their logs?')) {
+                            clients = clients.filter(function(c) { return c.id !== id; });
+                            saveClients(); renderDashboard(); showToast('Client deleted successfully.', 'success');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.copy-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        var link = this.dataset.link;
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(link).then(function() { showToast('Link copied to clipboard!', 'success'); }).catch(function() {
+                                var textarea = document.createElement('textarea');
+                                textarea.value = link;
+                                document.body.appendChild(textarea);
+                                textarea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textarea);
+                                showToast('Link copied to clipboard!', 'success');
+                            });
+                        } else {
+                            var textarea = document.createElement('textarea');
+                            textarea.value = link;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            showToast('Link copied to clipboard!', 'success');
+                        }
+                    });
+                });
+            }
+
+            function showStatus(message, type) {
+                clientStatus.textContent = message;
+                clientStatus.className = 'status visible ' + type;
+                setTimeout(function() { clientStatus.className = 'status'; }, 4000);
+            }
+
+            // ---------- MODAL ----------
+            function openModal(clientId) {
+                clientId = clientId || null;
+                editingClientId = clientId;
+
+                if (clientId) {
+                    var client = null;
+                    for (var j = 0; j < clients.length; j++) { if (clients[j].id === clientId) { client = clients[j]; break; } }
+                    if (client) {
+                        modalTitle.textContent = 'Upload Log for ' + client.name;
+                        modalSubtitle.textContent = 'Upload a new log file for this client.';
+                        clientName.value = client.name; clientName.disabled = true;
+                        clientEmail.value = client.email || ''; clientEmail.disabled = true;
+                        clientPasswordInput.value = client.password; clientPasswordInput.disabled = true;
+                        expirySelect.value = client.expiryDays || 14; expirySelect.disabled = true;
+                        modalSubmitBtn.textContent = 'Upload Log';
+                    }
+                } else {
+                    modalTitle.textContent = 'Add New Client';
+                    modalSubtitle.textContent = 'Enter client details and upload their logs.';
+                    clientName.value = ''; clientName.disabled = false;
+                    clientEmail.value = ''; clientEmail.disabled = false;
+                    clientPasswordInput.value = ''; clientPasswordInput.disabled = false;
+                    expirySelect.value = '14'; expirySelect.disabled = false;
+                    modalSubmitBtn.textContent = 'Save Client';
+                }
+
+                selectedFile = null; selectedFileName = '';
+                fileInfo.classList.remove('visible');
+                fileInput.value = '';
+
+                modalOverlay.classList.add('active');
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('active');
+                editingClientId = null;
+                clientName.disabled = false; clientEmail.disabled = false;
+                clientPasswordInput.disabled = false; expirySelect.disabled = false;
+                selectedFile = null; selectedFileName = '';
+                fileInfo.classList.remove('visible');
+                fileInput.value = '';
+            }
+
+            function saveClient() {
+                var name = clientName.value.trim();
+                var email = clientEmail.value.trim();
+                var password = clientPasswordInput.value.trim();
+                var expiryDays = parseInt(expirySelect.value) || 0;
+
+                if (!name) { showStatus('Please enter a client name.', 'error'); return; }
+                if (!password) { showStatus('Please set a password for the client.', 'error'); return; }
+
+                if (editingClientId) {
+                    var client = null;
+                    for (var j = 0; j < clients.length; j++) { if (clients[j].id === editingClientId) { client = clients[j]; break; } }
+                    if (client) {
+                        if (selectedFile) {
+                            var reader = new FileReader();
+                            reader.onload = function(e) {
+                                var content = e.target.result;
+                                if (!client.logs) client.logs = [];
+                                client.logs.push({ id: generateId(), filename: selectedFileName, content: content, uploadedAt: Date.now(), views: 0, lastViewed: null });
+                                saveClients(); closeModal(); renderDashboard();
+                                showStatus('Log uploaded successfully!', 'success');
+                                showToast('📤 Log uploaded for ' + client.name, 'success');
+                            };
+                            reader.readAsText(selectedFile);
+                        } else { showStatus('Please select a log file to upload.', 'error'); return; }
+                    }
+                } else {
+                    var newClient = {
+                        id: generateId(), name: name, email: email || '', password: password,
+                        logs: [], createdAt: Date.now(), lastView: null,
+                        expiryDays: expiryDays, loginAttempts: 0, lockedUntil: 0, loginHistory: []
+                    };
+
+                    if (selectedFile) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            var content = e.target.result;
+                            newClient.logs.push({ id: generateId(), filename: selectedFileName, content: content, uploadedAt: Date.now(), views: 0, lastViewed: null });
+                            clients.push(newClient);
+                            saveClients(); closeModal(); renderDashboard();
+                            showStatus('Client added successfully with log!', 'success');
+                            showToast('🎉 Client ' + name + ' added!', 'success');
+                        };
+                        reader.readAsText(selectedFile);
+                    } else {
+                        clients.push(newClient);
+                        saveClients(); closeModal(); renderDashboard();
+                        showStatus('Client added successfully!', 'success');
+                        showToast('🎉 Client ' + name + ' added!', 'success');
+                    }
+                }
+            }
+
+            // ---------- FILE HANDLING ----------
+            fileUploadArea.addEventListener('click', function() { fileInput.click(); });
+
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    var file = this.files[0];
+                    if (file.size > 10 * 1024 * 1024) {
+                        showStatus('File too large. Maximum 10MB.', 'error');
+                        this.value = '';
+                        return;
+                    }
+                    selectedFile = file;
+                    selectedFileName = file.name;
+                    fileNameDisplay.textContent = file.name;
+                    fileInfo.classList.add('visible');
+                }
+            });
+
+            removeFileBtn.addEventListener('click', function() {
+                selectedFile = null; selectedFileName = '';
+                fileInfo.classList.remove('visible');
+                fileInput.value = '';
+            });
+
+            // ---------- DELIVERY FORMAT ----------
+            function renderDeliveryContent(content) {
+                var lines = content.split('\n');
+                var html = '<div class="delivery-card">';
+                var inRules = false, inQuality = false;
+
+                for (var i = 0; i < lines.length; i++) {
+                    var line = lines[i].trim();
+                    if (!line && i < 3) continue;
+
+                    if (line.indexOf('🇩🇰') !== -1) {
+                        html += '<div class="platform-icon">🇩🇰</div>';
+                        html += '<h3>' + escapeHtml(line) + '</h3>';
+                        continue;
+                    }
+                    if (line.indexOf('Thank you for your purchase') !== -1) {
+                        html += '<div class="thank-you">' + escapeHtml(line) + '</div>';
+                        continue;
+                    }
+                    if (line === 'Account Details') {
+                        html += '<div class="section-title">📋 ' + escapeHtml(line) + '</div>';
+                        continue;
+                    }
+                    if (line === 'How to Access') {
+                        html += '<div class="section-title">🔑 ' + escapeHtml(line) + '</div>';
+                        continue;
+                    }
+                    if (line === 'Account Quality') {
+                        html += '<div class="section-title">✅ ' + escapeHtml(line) + '</div>';
+                        html += '<div class="quality-box">';
+                        inQuality = true;
+                        continue;
+                    }
+                    if (line.indexOf('STRICT RULES') !== -1) {
+                        if (inQuality) { html += '</div>'; inQuality = false; }
+                        html += '<div class="rules-box">';
+                        html += '<div class="rules-title">⚠️ ' + escapeHtml(line) + '</div>';
+                        inRules = true;
+                        continue;
+                    }
+                    if (inRules && line.match(/^\d+\./)) {
+                        html += '<div class="rule-item">' + escapeHtml(line) + '</div>';
+                        continue;
+                    }
+                    if (line.indexOf('•') === 0) {
+                        html += '<div class="detail-item">' + escapeHtml(line) + '</div>';
+                        continue;
+                    }
+                    if (line.match(/^\d+\.\s/)) {
+                        html += '<div class="detail-item" style="font-weight:500;color:var(--text-primary);">' + escapeHtml(line) + '</div>';
+                        continue;
+                    }
+                    if (line.indexOf('DM me when you') !== -1) {
+                        html += '<div class="code-request"><p>📥 <strong>' + escapeHtml(line) + '</strong></p></div>';
+                        continue;
+                    }
+                    if (line.indexOf('Failure to follow these rules') !== -1) {
+                        html += '<div class="footer-note"><strong>❌ ' + escapeHtml(line) + '</strong></div>';
+                        continue;
+                    }
+                    if (line && line.indexOf('---') === -1) {
+                        html += '<p style="color:var(--text-secondary);font-size:14px;margin:4px 0;">' + escapeHtml(line) + '</p>';
+                    }
+                }
+
+                if (inQuality) html += '</div>';
+                if (inRules) html += '</div>';
+                html += '</div>';
+                return html;
+            }
+
+            // ---------- CLIENT VIEW ----------
+            function handleClientView() {
+                var clientId = getQueryParam('client');
+                if (!clientId) return;
+
+                authScreen.style.display = 'none';
+                dashboard.style.display = 'none';
+                clientView.style.display = 'block';
+
+                var client = null;
+                for (var j = 0; j < clients.length; j++) { if (clients[j].id === clientId) { client = clients[j]; break; } }
+
+                if (!client) {
+                    clientView.innerHTML = '<div style="text-align:center;padding:30px 20px;"><div style="font-size:48px;margin-bottom:12px;">🔍</div><h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Client Not Found</h2><p style="color:var(--text-secondary);">This client link is invalid or has been removed.</p></div>';
+                    return;
+                }
+
+                var hasExpiry = client.expiryDays && client.expiryDays > 0;
+                var expiryDate = hasExpiry ? client.createdAt + (client.expiryDays * 86400000) : 0;
+                if (hasExpiry && isExpired(expiryDate)) {
+                    clientView.innerHTML = '<div style="text-align:center;padding:30px 20px;"><div style="font-size:48px;margin-bottom:12px;">⏰</div><h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Access Expired</h2><p style="color:var(--text-secondary);">This client\'s access has expired. Please contact Tradesphere Hub for renewal.</p></div>';
+                    return;
+                }
+
+                if (client.lockedUntil && client.lockedUntil > Date.now()) {
+                    var remaining = Math.ceil((client.lockedUntil - Date.now()) / 60000);
+                    clientView.innerHTML = '<div style="text-align:center;padding:30px 20px;"><div style="font-size:48px;margin-bottom:12px;">🔒</div><h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Account Locked</h2><p style="color:var(--text-secondary);">Too many failed login attempts. Please wait ' + remaining + ' minute(s) before trying again.</p></div>';
+                    return;
+                }
+
+                clientViewName.textContent = client.name;
+                clientViewEmail.textContent = client.email ? '📧 ' + client.email : '';
+                deviceInfo.textContent = getDeviceInfo();
+                locationInfo.textContent = getLocationInfo();
+                sessionExpiry.textContent = '24h remaining';
+
+                var remainingAttempts = MAX_LOGIN_ATTEMPTS - client.loginAttempts;
+                if (remainingAttempts > 0) {
+                    attemptsInfo.innerHTML = '🔐 <span class="' + (remainingAttempts > 1 ? 'safe' : 'warn') + '">' + remainingAttempts + ' attempt(s) remaining</span>';
+                } else {
+                    attemptsInfo.innerHTML = '🔒 <span class="warn">No attempts remaining</span>';
+                }
+
+                clientViewBtn.onclick = function() {
+                    var enteredPassword = clientPassword.value.trim();
+
+                    if (client.lockedUntil && client.lockedUntil > Date.now()) {
+                        var rem = Math.ceil((client.lockedUntil - Date.now()) / 60000);
+                        clientViewError.textContent = '❌ Account locked. Please wait ' + rem + ' minute(s).';
+                        clientViewError.style.display = 'block';
+                        return;
+                    }
+
+                    if (enteredPassword === client.password) {
+                        client.loginAttempts = 0;
+                        client.lockedUntil = 0;
+                        client.lastView = Date.now();
+
+                        if (!client.loginHistory) client.loginHistory = [];
+                        client.loginHistory.push({ timestamp: Date.now(), success: true, device: getDeviceInfo(), location: getLocationInfo() });
+
+                        saveClients();
+                        clientViewError.style.display = 'none';
+                        logContent.style.display = 'block';
+                        lockIcon.textContent = '🔓';
+                        lockIcon.className = 'lock-icon unlocked';
+
+                        if (client.logs && client.logs.length > 0) {
+                            var html = '';
+                            for (var k = 0; k < client.logs.length; k++) {
+                                var log = client.logs[k];
+                                log.views = (log.views || 0) + 1;
+                                log.lastViewed = Date.now();
+                                html += renderDeliveryContent(log.content);
+                            }
+                            logContent.innerHTML = html;
+                            saveClients();
+                        } else {
+                            logContent.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);"><div style="font-size:32px;margin-bottom:8px;">📭</div><p>No logs uploaded yet.</p></div>';
+                        }
+
+                        clientPassword.disabled = true;
+                        clientViewBtn.disabled = true;
+                        clientViewBtn.textContent = '✅ Access Granted';
+                        attemptsInfo.innerHTML = '🔓 <span class="safe">Access granted</span>';
+                        showToast('✅ Welcome back, ' + client.name + '!', 'success');
+
+                    } else {
+                        client.loginAttempts = (client.loginAttempts || 0) + 1;
+
+                        if (!client.loginHistory) client.loginHistory = [];
+                        client.loginHistory.push({ timestamp: Date.now(), success: false, device: getDeviceInfo(), location: getLocationInfo() });
+
+                        var rem = MAX_LOGIN_ATTEMPTS - client.loginAttempts;
+
+                        if (client.loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+                            client.lockedUntil = Date.now() + (LOCKOUT_MINUTES * 60 * 1000);
+                            saveClients();
+                            clientViewError.textContent = '❌ Too many failed attempts. Account locked for ' + LOCKOUT_MINUTES + ' minutes.';
+                            clientViewError.style.display = 'block';
+                            attemptsInfo.innerHTML = '🔒 <span class="warn">Account locked</span>';
+                            clientPassword.disabled = true;
+                            clientViewBtn.disabled = true;
+                            showToast('🔒 Account locked due to failed attempts.', 'error');
+                        } else {
+                            saveClients();
+                            clientViewError.textContent = '❌ Incorrect password. ' + rem + ' attempt(s) remaining.';
+                            clientViewError.style.display = 'block';
+                            if (rem > 0) {
+                                attemptsInfo.innerHTML = '🔐 <span class="' + (rem > 1 ? 'safe' : 'warn') + '">' + rem + ' attempt(s) remaining</span>';
+                            } else {
+                                attemptsInfo.innerHTML = '🔒 <span class="warn">No attempts remaining</span>';
+                            }
+                            showToast('⚠️ Incorrect password.', 'error');
+                        }
+                        clientPassword.value = '';
+                    }
+                };
+
+                clientPassword.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { clientViewBtn.click(); }
+                });
+
+                setTimeout(function() { clientPassword.focus(); }, 500);
+            }
+
+            // ---------- EXPORT ----------
+            function exportCSV() {
+                if (clients.length === 0) { showToast('No clients to export.', 'error'); return; }
+
+                var csv = 'Client Name,Email,Logs,Created,Last View,Expiry,Login Attempts\n';
+                for (var i = 0; i < clients.length; i++) {
+                    var c = clients[i];
+                    var logCount = c.logs ? c.logs.length : 0;
+                    var expiry = c.expiryDays ? c.expiryDays + ' days' : 'Never';
+                    csv += '"' + c.name + '","' + (c.email || '') + '",' + logCount + ',"' + formatDate(c.createdAt) + '","' + (c.lastView ? formatDate(c.lastView) : 'Never') + '","' + expiry + '",' + (c.loginAttempts || 0) + '\n';
+                }
+
+                var blob = new Blob([csv], { type: 'text/csv' });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'tradesphere_clients_' + new Date().toISOString().slice(0, 10) + '.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📤 CSV exported successfully!', 'success');
+            }
+
+            // ---------- EVENT LISTENERS ----------
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+
+            logoutBtn.addEventListener('click', logout);
+
+            addClientBtn.addEventListener('click', function() { openModal(); });
+            exportBtn.addEventListener('click', exportCSV);
+
+            modalCancelBtn.addEventListener('click', closeModal);
+            modalSubmitBtn.addEventListener('click', saveClient);
+
+            modalOverlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+            searchInput.addEventListener('input', function() { searchQuery = this.value; renderDashboard(); });
+
+            navDashboard.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (isAuthenticated) {
+                    dashboard.style.display = 'block';
+                    clientView.style.display = 'none';
+                    renderDashboard();
+                    document.querySelectorAll('.nav a').forEach(function(a) { a.classList.remove('active'); });
+                    this.classList.add('active');
+                }
+            });
+
+            navClients.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (isAuthenticated) {
+                    dashboard.style.display = 'block';
+                    clientView.style.display = 'none';
+                    renderDashboard();
+                    document.querySelectorAll('.nav a').forEach(function(a) { a.classList.remove('active'); });
+                    this.classList.add('active');
+                    document.querySelector('.clients-section').scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+
+            // ---------- INIT ----------
+            function init() {
+                loadClients();
+                var clientId = getQueryParam('client');
+                if (clientId) { handleClientView(); return; }
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                clientView.style.display = 'none';
+            }
+
+            window.addEventListener('popstate', function() {
+                var clientId = getQueryParam('client');
+                if (clientId) { handleClientView(); }
+                else { authScreen.style.display = 'block'; dashboard.style.display = 'none'; clientView.style.display = 'none'; }
+            });
+
+            init();
+
+            console.log('📦 Client Portal loaded');
+            console.log('👥 Clients:', clients.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
