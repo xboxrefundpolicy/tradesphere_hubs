@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Add Client</title>
+    <style>
+        body { background: #0A0A0A; color: white; font-family: sans-serif; padding: 20px; }
+        .btn { padding: 14px 28px; background: #F59E0B; color: #000; border: none; border-radius: 40px; font-weight: 700; font-size: 16px; cursor: pointer; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background: #141414; padding: 30px; border-radius: 16px; max-width: 400px; width: 100%; }
+        .modal-content input { width: 100%; padding: 12px; margin-bottom: 12px; background: #1E1E1E; border: 1px solid #2A2A2A; border-radius: 8px; color: white; }
+        .close-btn { padding: 10px 20px; background: #EF4444; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        .save-btn { padding: 10px 20px; background: #F59E0B; color: #000; border: none; border-radius: 8px; cursor: pointer; margin-right: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>Test Page</h1>
+    <button class="btn" id="addClientBtn">+ Add Client</button>
+
+    <div class="modal" id="testModal">
+        <div class="modal-content">
+            <h2>Add Client</h2>
+            <input type="text" placeholder="Client Name" />
+            <input type="email" placeholder="Client Email" />
+            <input type="password" placeholder="Password" />
+            <button class="save-btn" id="saveBtn">Save</button>
+            <button class="close-btn" id="closeBtn">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('addClientBtn').addEventListener('click', function() {
+            document.getElementById('testModal').classList.add('active');
+        });
+
+        document.getElementById('closeBtn').addEventListener('click', function() {
+            document.getElementById('testModal').classList.remove('active');
+        });
+
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            alert('Client saved (test)');
+            document.getElementById('testModal').classList.remove('active');
+        });
+    </script>
+
+</body>
+</html>
