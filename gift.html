@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – Gift Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 900px; width:100%; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 40px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+        #dashboard { display: none; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: border 0.3s ease;
+        }
+        .stat-card:hover { border-color: var(--accent-gold); }
+        .stat-card .number { font-size: 24px; font-weight: 800; color: var(--accent-gold); }
+        .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .add-btn {
+            background: var(--accent-gold); color: #000; border: none;
+            padding: 10px 18px; border-radius: 40px; font-weight: 700; font-size: 13px;
+            cursor: pointer; transition: 0.3s ease; display: flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .add-btn:hover { background: var(--accent-gold-hover); transform: scale(1.02); }
+
+        .gift-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        .gift-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 18px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .gift-card:hover { border-color: var(--accent-gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .gift-card .status-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 10px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .gift-card .status-badge.pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+        .gift-card .status-badge.redeemed { background: rgba(16,185,129,0.15); color: var(--success); }
+        .gift-card .status-badge.expired { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .gift-card .gift-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+        .gift-card .gift-value { color: var(--accent-gold); font-weight: 700; font-size: 16px; }
+        .gift-card .gift-message { color: var(--text-secondary); font-size: 13px; margin: 6px 0; }
+        .gift-card .gift-details { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+        .gift-card .gift-details .label { color: var(--text-secondary); }
+        .gift-card .gift-details .value { color: var(--text-primary); }
+        .gift-card .link-area {
+            background: var(--bg-input);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 10px 0;
+            font-size: 12px;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .gift-card .link-area a { color: var(--accent-gold); text-decoration: none; flex: 1; }
+        .gift-card .link-area a:hover { text-decoration: underline; }
+        .gift-card .link-area .copy-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            white-space: nowrap;
+        }
+        .gift-card .link-area .copy-btn:hover { background: rgba(245,158,11,0.15); color: var(--accent-gold); border-color: var(--accent-gold); }
+        .gift-card .actions { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+        .gift-card .actions button {
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .gift-card .delete-btn { background: rgba(239,68,68,0.08); color: var(--danger); }
+        .gift-card .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+        .empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
+        .empty-state p { font-size: 14px; }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .modal .subtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
+        .modal label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 4px; color: var(--text-secondary); }
+        .modal input, .modal textarea, .modal select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus { outline: none; border-color: var(--accent-gold); }
+        .modal textarea { min-height: 60px; resize: vertical; font-family: inherit; }
+        .modal select { appearance: auto; }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 4px; }
+        .modal .btn-group .submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .submit-btn:hover { background: var(--accent-gold-hover); }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
+        #recipientView {
+            display: none;
+            max-width: 500px;
+            margin: 40px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        #recipientView .gift-icon { font-size: 64px; margin-bottom: 12px; }
+        #recipientView h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        #recipientView .from { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+        #recipientView .gift-detail {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            border-left: 4px solid var(--accent-gold);
+            text-align: left;
+        }
+        #recipientView .gift-detail .label { color: var(--text-secondary); font-size: 12px; }
+        #recipientView .gift-detail .value { color: var(--text-primary); font-size: 16px; font-weight: 600; }
+        #recipientView .gift-detail .message { color: var(--text-secondary); font-size: 14px; margin-top: 8px; }
+        #recipientView .redeem-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #recipientView .redeem-btn:hover { background: var(--accent-gold-hover); }
+        #recipientView .redeem-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #recipientView .error-msg { color: var(--danger); font-size: 13px; margin-top: 12px; display: none; }
+        #recipientView .success-msg { color: var(--success); font-size: 15px; margin-top: 12px; display: none; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: 1fr 1fr; }
+            .modal { padding: 20px 16px; }
+            #authScreen, #recipientView { padding: 24px 18px; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+        }
+        @media (max-width: 480px) {
+            .stat-card .number { font-size: 20px; }
+            .gift-card { padding: 14px; }
+            .gift-card .link-area { font-size: 11px; flex-wrap: wrap; }
+            .modal .btn-group { flex-direction: column; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="/index.html">🏠 Home</a>
+                <a class="active" href="#">🎁 Gift Hub</a>
+                <a href="/portal.html">📦 Portal</a>
+            </nav>
+        </header>
+
+        <div id="authScreen">
+            <h2>🎁 Gift Hub</h2>
+            <p>Enter your admin password to manage gifts.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access Gift Hub</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <div id="dashboard">
+
+            <div class="stats" id="statsBar">
+                <div class="stat-card"><div class="number" id="totalGifts">0</div><div class="label">Total Gifts</div></div>
+                <div class="stat-card"><div class="number" id="pendingGifts">0</div><div class="label">Pending</div></div>
+                <div class="stat-card"><div class="number" id="redeemedGifts">0</div><div class="label">Redeemed</div></div>
+            </div>
+
+            <div class="toolbar">
+                <button class="add-btn" id="addGiftBtn">+ Create Gift</button>
+            </div>
+
+            <div id="giftList"></div>
+        </div>
+
+        <div id="recipientView">
+            <div class="gift-icon">🎁</div>
+            <h2>You've Received a Gift!</h2>
+            <div class="from" id="giftFrom">From: Tradesphere Hub</div>
+            <div class="gift-detail" id="giftDetail">
+                <div class="label">Gift</div>
+                <div class="value" id="giftName">Free TikTok Log</div>
+                <div class="label" style="margin-top:8px;">Value</div>
+                <div class="value" id="giftValue">$10</div>
+                <div class="message" id="giftMessage">Thanks for being a loyal customer!</div>
+            </div>
+            <button class="redeem-btn" id="redeemBtn">🎁 Redeem Gift</button>
+            <div class="error-msg" id="recipientError">This gift has already been redeemed.</div>
+            <div class="success-msg" id="recipientSuccess">🎉 Gift redeemed successfully!</div>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h2 id="modalTitle">Create New Gift</h2>
+                <div class="subtitle" id="modalSubtitle">Enter gift details below.</div>
+
+                <label>Gift Name *</label>
+                <input type="text" id="giftNameInput" placeholder="e.g., Free TikTok Log" />
+
+                <label>Gift Value *</label>
+                <input type="text" id="giftValueInput" placeholder="e.g., $10 or Free" />
+
+                <label>Message (optional)</label>
+                <textarea id="giftMessageInput" placeholder="A personal message for the recipient..."></textarea>
+
+                <label>Expiry</label>
+                <select id="expirySelect">
+                    <option value="7">7 days</option>
+                    <option value="14" selected>14 days</option>
+                    <option value="30">30 days</option>
+                    <option value="90">90 days</option>
+                    <option value="0">Never expire</option>
+                </select>
+
+                <div class="btn-group">
+                    <button class="submit-btn" id="modalSubmitBtn">Create Gift</button>
+                    <button class="cancel-btn" id="modalCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Gift Hub · v1.0</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            let isAuthenticated = false;
+            let gifts = [];
+            let editingGiftId = null;
+
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const recipientView = document.getElementById('recipientView');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+
+            const giftList = document.getElementById('giftList');
+            const totalGifts = document.getElementById('totalGifts');
+            const pendingGifts = document.getElementById('pendingGifts');
+            const redeemedGifts = document.getElementById('redeemedGifts');
+
+            const addGiftBtn = document.getElementById('addGiftBtn');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const giftNameInput = document.getElementById('giftNameInput');
+            const giftValueInput = document.getElementById('giftValueInput');
+            const giftMessageInput = document.getElementById('giftMessageInput');
+            const expirySelect = document.getElementById('expirySelect');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            const giftFrom = document.getElementById('giftFrom');
+            const giftName = document.getElementById('giftName');
+            const giftValue = document.getElementById('giftValue');
+            const giftMessage = document.getElementById('giftMessage');
+            const redeemBtn = document.getElementById('redeemBtn');
+            const recipientError = document.getElementById('recipientError');
+            const recipientSuccess = document.getElementById('recipientSuccess');
+
+            const toast = document.getElementById('toast');
+
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+            function generateLink(giftId) { return window.location.origin + window.location.pathname + '?gift=' + giftId; }
+            function formatDate(ts) { if (!ts) return 'N/A'; return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+            function getQueryParam(param) { const urlParams = new URLSearchParams(window.location.search); return urlParams.get(param); }
+            function isExpired(expiryDate) { if (!expiryDate || expiryDate === 0) return false; return Date.now() > expiryDate; }
+            function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+            function showToast(message, type, duration) {
+                type = type || 'info'; duration = duration || 3000;
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, duration);
+            }
+
+            function loadGifts() {
+                try {
+                    const data = localStorage.getItem('tradesphere_gifts');
+                    if (data) { gifts = JSON.parse(data); } else { gifts = []; saveGifts(); }
+                } catch (e) { gifts = []; }
+                return gifts;
+            }
+
+            function saveGifts() { localStorage.setItem('tradesphere_gifts', JSON.stringify(gifts)); }
+
+            function login() {
+                const password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    recipientView.style.display = 'none';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderDashboard();
+                    showToast('Welcome to Gift Hub!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            function renderDashboard() {
+                loadGifts();
+                const total = gifts.length;
+                const pending = gifts.filter(g => g.redeemed === false && !isExpired(g.expiryDate)).length;
+                const redeemed = gifts.filter(g => g.redeemed === true).length;
+
+                totalGifts.textContent = total;
+                pendingGifts.textContent = pending;
+                redeemedGifts.textContent = redeemed;
+
+                if (gifts.length === 0) {
+                    giftList.innerHTML = '<div class="empty-state"><div class="icon">🎁</div><h3>No gifts created yet</h3><p>Click "Create Gift" to get started.</p></div>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < gifts.length; i++) {
+                    const g = gifts[i];
+                    const expired = isExpired(g.expiryDate);
+                    let statusClass = 'pending';
+                    let statusText = '⏳ Pending';
+                    if (g.redeemed) { statusClass = 'redeemed'; statusText = '✅ Redeemed'; }
+                    else if (expired) { statusClass = 'expired'; statusText = '⏰ Expired'; }
+
+                    html += `
+                        <div class="gift-card">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <div class="gift-name">🎁 ${escapeHtml(g.name)}</div>
+                            <div class="gift-value">${escapeHtml(g.value)}</div>
+                            ${g.message ? `<div class="gift-message">"${escapeHtml(g.message)}"</div>` : ''}
+                            <div class="gift-details">
+                                <span>📅 Created: ${formatDate(g.createdAt)}</span>
+                                ${g.expiryDays > 0 ? `<span style="margin-left:12px;">⏳ Expires: ${g.expiryDays} days</span>` : '<span style="margin-left:12px;">♾️ Never expires</span>'}
+                                ${g.redeemed ? `<span style="margin-left:12px;">👤 Redeemed by: ${escapeHtml(g.redeemedBy || 'Unknown')}</span>` : ''}
+                            </div>
+                            ${!g.redeemed ? `
+                            <div class="link-area">
+                                <a href="${generateLink(g.id)}" target="_blank">${generateLink(g.id)}</a>
+                                <button class="copy-btn" data-link="${generateLink(g.id)}">📋 Copy</button>
+                            </div>
+                            ` : ''}
+                            <div class="actions">
+                                ${!g.redeemed ? `<button class="delete-btn" data-id="${g.id}">🗑️ Delete</button>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                giftList.innerHTML = html;
+
+                document.querySelectorAll('.copy-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const link = this.dataset.link;
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(link).then(function() {
+                                showToast('Link copied to clipboard!', 'success');
+                            }).catch(function() {
+                                const textarea = document.createElement('textarea');
+                                textarea.value = link;
+                                document.body.appendChild(textarea);
+                                textarea.select();
+                                document.execCommand('copy');
+                                document.body.removeChild(textarea);
+                                showToast('Link copied to clipboard!', 'success');
+                            });
+                        } else {
+                            const textarea = document.createElement('textarea');
+                            textarea.value = link;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            showToast('Link copied to clipboard!', 'success');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        if (confirm('Delete this gift?')) {
+                            gifts = gifts.filter(function(g) { return g.id !== id; });
+                            saveGifts();
+                            renderDashboard();
+                            showToast('Gift deleted.', 'info');
+                        }
+                    });
+                });
+            }
+
+            function openModal() {
+                modalTitle.textContent = 'Create New Gift';
+                modalSubtitle.textContent = 'Enter gift details below.';
+                giftNameInput.value = '';
+                giftValueInput.value = '';
+                giftMessageInput.value = '';
+                expirySelect.value = '14';
+                modalSubmitBtn.textContent = 'Create Gift';
+                modalOverlay.classList.add('active');
+            }
+
+            function closeModal() { modalOverlay.classList.remove('active'); }
+
+            function saveGift() {
+                const name = giftNameInput.value.trim();
+                const value = giftValueInput.value.trim();
+                const message = giftMessageInput.value.trim();
+                const expiryDays = parseInt(expirySelect.value) || 0;
+
+                if (!name) { showToast('Please enter a gift name.', 'error'); return; }
+                if (!value) { showToast('Please enter a gift value.', 'error'); return; }
+
+                const newGift = {
+                    id: generateId(),
+                    name: name,
+                    value: value,
+                    message: message || '',
+                    createdAt: Date.now(),
+                    expiryDays: expiryDays,
+                    expiryDate: expiryDays > 0 ? Date.now() + (expiryDays * 86400000) : 0,
+                    redeemed: false,
+                    redeemedBy: null,
+                    redeemedAt: null
+                };
+
+                gifts.push(newGift);
+                saveGifts();
+                closeModal();
+                renderDashboard();
+                showToast('🎁 Gift created! Share the link with someone.', 'success');
+            }
+
+            function handleRecipientView() {
+                const giftId = getQueryParam('gift');
+                if (!giftId) return;
+
+                authScreen.style.display = 'none';
+                dashboard.style.display = 'none';
+                recipientView.style.display = 'block';
+
+                let gift = null;
+                for (let i = 0; i < gifts.length; i++) {
+                    if (gifts[i].id === giftId) { gift = gifts[i]; break; }
+                }
+
+                if (!gift) {
+                    recipientView.innerHTML = `
+                        <div style="text-align:center;padding:30px 20px;">
+                            <div style="font-size:48px;margin-bottom:12px;">🔍</div>
+                            <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Gift Not Found</h2>
+                            <p style="color:var(--text-secondary);">This gift link is invalid or has been removed.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (isExpired(gift.expiryDate)) {
+                    recipientView.innerHTML = `
+                        <div style="text-align:center;padding:30px 20px;">
+                            <div style="font-size:48px;margin-bottom:12px;">⏰</div>
+                            <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Gift Expired</h2>
+                            <p style="color:var(--text-secondary);">This gift has expired and can no longer be redeemed.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (gift.redeemed) {
+                    recipientView.innerHTML = `
+                        <div style="text-align:center;padding:30px 20px;">
+                            <div style="font-size:48px;margin-bottom:12px;">✅</div>
+                            <h2 style="font-size:22px;font-weight:700;margin-bottom:6px;">Already Redeemed</h2>
+                            <p style="color:var(--text-secondary);">This gift was redeemed on ${formatDate(gift.redeemedAt)} by ${escapeHtml(gift.redeemedBy || 'someone')}.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                giftName.textContent = gift.name;
+                giftValue.textContent = gift.value;
+                giftMessage.textContent = gift.message || 'Enjoy your gift!';
+                giftFrom.textContent = 'From: Tradesphere Hub';
+
+                redeemBtn.onclick = function() {
+                    const email = prompt('Enter your email address to redeem this gift:');
+                    if (!email || !email.includes('@')) {
+                        recipientError.textContent = 'Please enter a valid email address.';
+                        recipientError.style.display = 'block';
+                        return;
+                    }
+
+                    gift.redeemed = true;
+                    gift.redeemedBy = email;
+                    gift.redeemedAt = Date.now();
+                    saveGifts();
+
+                    recipientError.style.display = 'none';
+                    recipientSuccess.style.display = 'block';
+                    redeemBtn.disabled = true;
+                    redeemBtn.textContent = '✅ Redeemed';
+                    showToast('🎉 Gift redeemed successfully!', 'success');
+                };
+            }
+
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+
+            addGiftBtn.addEventListener('click', openModal);
+            modalCancelBtn.addEventListener('click', closeModal);
+            modalSubmitBtn.addEventListener('click', saveGift);
+            modalOverlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+            function init() {
+                loadGifts();
+                const giftId = getQueryParam('gift');
+                if (giftId) { handleRecipientView(); return; }
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                recipientView.style.display = 'none';
+            }
+
+            window.addEventListener('popstate', function() {
+                const giftId = getQueryParam('gift');
+                if (giftId) { handleRecipientView(); }
+                else { authScreen.style.display = 'block'; dashboard.style.display = 'none'; recipientView.style.display = 'none'; }
+            });
+
+            init();
+            console.log('🎁 Gift Hub loaded, gifts:', gifts.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
