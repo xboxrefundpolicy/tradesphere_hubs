@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – FAQ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 800px; width:100%; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 30px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+        #dashboard { display: none; }
+        #publicView { display: block; }
+
+        .public-header { text-align:center; padding:20px 0; }
+        .public-header h1 { font-size:28px; font-weight:800; }
+        .public-header p { color:var(--text-secondary); font-size:14px; margin-top:4px; }
+
+        .search-box { margin: 20px 0; }
+        .search-box input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+        .search-box input:focus { outline: none; border-color: var(--accent-gold); }
+
+        .category-section { margin-bottom: 24px; }
+        .category-section h3 {
+            font-size: 18px; font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: border 0.3s ease;
+        }
+        .faq-item:hover { border-color: var(--accent-gold); }
+        .faq-question {
+            padding: 14px 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 15px;
+            transition: 0.3s ease;
+        }
+        .faq-question:hover { color: var(--accent-gold); }
+        .faq-question .arrow { transition: 0.3s ease; font-size: 14px; color: var(--text-secondary); }
+        .faq-question.open .arrow { transform: rotate(180deg); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 18px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .faq-answer.open { max-height: 500px; padding: 0 18px 18px; }
+
+        .admin-faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .admin-faq-item .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .admin-faq-item .category { color: var(--accent-gold); font-size: 12px; font-weight: 600; }
+        .admin-faq-item .question { font-weight: 600; font-size: 15px; }
+        .admin-faq-item .answer { color: var(--text-secondary); font-size: 14px; margin: 6px 0; }
+        .admin-faq-item .actions { display: flex; gap: 8px; }
+        .admin-faq-item .actions button {
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .admin-faq-item .edit-btn { background: rgba(245,158,11,0.15); color: var(--accent-gold); }
+        .admin-faq-item .edit-btn:hover { background: rgba(245,158,11,0.25); }
+        .admin-faq-item .delete-btn { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .admin-faq-item .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .toolbar .btn {
+            padding: 8px 18px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .toolbar .add-btn { background: var(--accent-gold); color: #000; }
+        .toolbar .add-btn:hover { background: var(--accent-gold-hover); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .modal .subtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
+        .modal label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 4px; color: var(--text-secondary); }
+        .modal input, .modal textarea, .modal select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus { outline: none; border-color: var(--accent-gold); }
+        .modal textarea { min-height: 80px; resize: vertical; font-family: inherit; }
+        .modal select { appearance: auto; }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 4px; }
+        .modal .btn-group .submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .submit-btn:hover { background: var(--accent-gold-hover); }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        @media (max-width: 480px) {
+            #authScreen { padding: 24px 18px; }
+            .modal { padding: 20px 16px; }
+            .admin-faq-item .top-row { flex-direction: column; align-items: flex-start; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="/index.html">🏠 Home</a>
+                <a class="active" href="#">❓ FAQ</a>
+            </nav>
+        </header>
+
+        <div id="publicView">
+            <div class="public-header">
+                <h1>❓ Frequently Asked Questions</h1>
+                <p>Find answers to common questions below.</p>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search for answers..." />
+            </div>
+            <div id="faqContainer"></div>
+        </div>
+
+        <div id="authScreen">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your admin password to manage FAQs.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access FAQ Manager</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <div id="dashboard">
+            <div class="toolbar">
+                <button class="btn add-btn" id="addFaqBtn">+ Add FAQ</button>
+            </div>
+            <div id="adminFaqList"></div>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h2 id="modalTitle">Add New FAQ</h2>
+                <div class="subtitle" id="modalSubtitle">Enter the question and answer below.</div>
+
+                <label>Category *</label>
+                <select id="categorySelect">
+                    <option value="Orders & Logs">Orders & Logs</option>
+                    <option value="Gifts & Rewards">Gifts & Rewards</option>
+                    <option value="Waiting List">Waiting List</option>
+                    <option value="General">General</option>
+                </select>
+
+                <label>Question *</label>
+                <input type="text" id="questionInput" placeholder="Enter the question..." />
+
+                <label>Answer *</label>
+                <textarea id="answerInput" placeholder="Enter the answer..."></textarea>
+
+                <div class="btn-group">
+                    <button class="submit-btn" id="modalSubmitBtn">Save FAQ</button>
+                    <button class="cancel-btn" id="modalCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · FAQ · v1.0</p>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            let faqs = [];
+            let isAuthenticated = false;
+            let editingIndex = null;
+
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const publicView = document.getElementById('publicView');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+            const faqContainer = document.getElementById('faqContainer');
+            const searchInput = document.getElementById('searchInput');
+            const adminFaqList = document.getElementById('adminFaqList');
+            const addFaqBtn = document.getElementById('addFaqBtn');
+
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const categorySelect = document.getElementById('categorySelect');
+            const questionInput = document.getElementById('questionInput');
+            const answerInput = document.getElementById('answerInput');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            const toast = document.getElementById('toast');
+
+            function showToast(message, type) {
+                type = type || 'info';
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, 3000);
+            }
+
+            function loadFaqs() {
+                try {
+                    const data = localStorage.getItem('tradesphere_faqs');
+                    if (data) { faqs = JSON.parse(data); } else { faqs = defaultFaqs(); saveFaqs(); }
+                } catch (e) { faqs = defaultFaqs(); saveFaqs(); }
+                return faqs;
+            }
+
+            function defaultFaqs() {
+                return [
+                    { category: 'Orders & Logs', question: 'How do I view my log?', answer: 'Click the link you received, enter your password, and your log will be displayed.' },
+                    { category: 'Orders & Logs', question: 'What if I lose my link?', answer: 'Contact us on WhatsApp and we will resend your link.' },
+                    { category: 'Orders & Logs', question: 'How long do I have access?', answer: 'Access expires based on the expiry date set when you purchased the log.' },
+                    { category: 'Gifts & Rewards', question: 'How do I redeem a gift?', answer: 'Click the gift link and follow the redemption instructions.' },
+                    { category: 'Gifts & Rewards', question: 'How do I earn referral rewards?', answer: 'Share your referral link with friends. When they purchase, you earn rewards!' }
+                ];
+            }
+
+            function saveFaqs() {
+                localStorage.setItem('tradesphere_faqs', JSON.stringify(faqs));
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function renderPublic(searchTerm) {
+                loadFaqs();
+                const categories = ['Orders & Logs', 'Gifts & Rewards', 'Waiting List', 'General'];
+                let search = searchTerm ? searchTerm.toLowerCase().trim() : '';
+
+                let html = '';
+                for (let c = 0; c < categories.length; c++) {
+                    const cat = categories[c];
+                    const catFaqs = faqs.filter(function(f) {
+                        return f.category === cat && (
+                            !search ||
+                            f.question.toLowerCase().includes(search) ||
+                            f.answer.toLowerCase().includes(search)
+                        );
+                    });
+                    if (catFaqs.length === 0) continue;
+
+                    html += '<div class="category-section"><h3>' + getCategoryIcon(cat) + ' ' + cat + '</h3>';
+                    for (let i = 0; i < catFaqs.length; i++) {
+                        const f = catFaqs[i];
+                        const index = faqs.indexOf(f);
+                        html += `
+                            <div class="faq-item">
+                                <div class="faq-question" data-index="${index}">
+                                    ${escapeHtml(f.question)}
+                                    <span class="arrow">▼</span>
+                                </div>
+                                <div class="faq-answer" data-index="${index}">${escapeHtml(f.answer)}</div>
+                            </div>
+                        `;
+                    }
+                    html += '</div>';
+                }
+
+                if (html === '') {
+                    html = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary);"><div style="font-size:36px;margin-bottom:8px;">🔍</div><p>No FAQs found matching your search.</p></div>';
+                }
+                faqContainer.innerHTML = html;
+
+                document.querySelectorAll('.faq-question').forEach(function(q) {
+                    q.addEventListener('click', function() {
+                        const index = this.dataset.index;
+                        const answer = document.querySelector('.faq-answer[data-index="' + index + '"]');
+                        this.classList.toggle('open');
+                        answer.classList.toggle('open');
+                    });
+                });
+            }
+
+            function getCategoryIcon(cat) {
+                if (cat === 'Orders & Logs') return '📦';
+                if (cat === 'Gifts & Rewards') return '🎁';
+                if (cat === 'Waiting List') return '📋';
+                return '❓';
+            }
+
+            function renderAdmin() {
+                loadFaqs();
+                if (faqs.length === 0) {
+                    adminFaqList.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text-secondary);"><div style="font-size:36px;margin-bottom:8px;">📭</div><p>No FAQs yet. Click "Add FAQ" to create one.</p></div>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < faqs.length; i++) {
+                    const f = faqs[i];
+                    html += `
+                        <div class="admin-faq-item">
+                            <div class="top-row">
+                                <span class="category">${getCategoryIcon(f.category)} ${escapeHtml(f.category)}</span>
+                                <div class="actions">
+                                    <button class="edit-btn" data-index="${i}">✏️ Edit</button>
+                                    <button class="delete-btn" data-index="${i}">🗑️</button>
+                                </div>
+                            </div>
+                            <div class="question">${escapeHtml(f.question)}</div>
+                            <div class="answer">${escapeHtml(f.answer)}</div>
+                        </div>
+                    `;
+                }
+                adminFaqList.innerHTML = html;
+
+                document.querySelectorAll('.edit-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        openModal(index);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        if (confirm('Delete this FAQ?')) {
+                            faqs.splice(index, 1);
+                            saveFaqs();
+                            renderAdmin();
+                            renderPublic();
+                            showToast('FAQ deleted.', 'info');
+                        }
+                    });
+                });
+            }
+
+            function login() {
+                const password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    publicView.style.display = 'none';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderAdmin();
+                    showToast('Welcome to FAQ Manager!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            function openModal(index) {
+                editingIndex = index;
+                if (index !== null && faqs[index]) {
+                    const f = faqs[index];
+                    modalTitle.textContent = 'Edit FAQ';
+                    modalSubtitle.textContent = 'Update the question and answer.';
+                    categorySelect.value = f.category;
+                    questionInput.value = f.question;
+                    answerInput.value = f.answer;
+                    modalSubmitBtn.textContent = 'Update FAQ';
+                } else {
+                    modalTitle.textContent = 'Add New FAQ';
+                    modalSubtitle.textContent = 'Enter the question and answer below.';
+                    categorySelect.value = 'Orders & Logs';
+                    questionInput.value = '';
+                    answerInput.value = '';
+                    modalSubmitBtn.textContent = 'Save FAQ';
+                }
+                modalOverlay.classList.add('active');
+            }
+
+            function closeModal() { modalOverlay.classList.remove('active'); editingIndex = null; }
+
+            function saveFaq() {
+                const category = categorySelect.value;
+                const question = questionInput.value.trim();
+                const answer = answerInput.value.trim();
+
+                if (!question) { showToast('Please enter a question.', 'error'); return; }
+                if (!answer) { showToast('Please enter an answer.', 'error'); return; }
+
+                if (editingIndex !== null && faqs[editingIndex]) {
+                    faqs[editingIndex] = { category, question, answer };
+                } else {
+                    faqs.push({ category, question, answer });
+                }
+                saveFaqs();
+                closeModal();
+                renderAdmin();
+                renderPublic();
+                showToast('FAQ saved!', 'success');
+            }
+
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+
+            addFaqBtn.addEventListener('click', function() { openModal(null); });
+            modalCancelBtn.addEventListener('click', closeModal);
+            modalSubmitBtn.addEventListener('click', saveFaq);
+            modalOverlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+            searchInput.addEventListener('input', function() { renderPublic(this.value); });
+
+            function init() {
+                loadFaqs();
+                renderPublic('');
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                publicView.style.display = 'block';
+            }
+
+            init();
+            console.log('❓ FAQ loaded, count:', faqs.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
