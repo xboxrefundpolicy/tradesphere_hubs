@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – Referral System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 900px; width:100%; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 40px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+        #dashboard { display: none; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            transition: border 0.3s ease;
+        }
+        .stat-card:hover { border-color: var(--accent-gold); }
+        .stat-card .number { font-size: 24px; font-weight: 800; color: var(--accent-gold); }
+        .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .referral-list { margin-top: 20px; }
+        .referral-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        .referral-card:hover { border-color: var(--accent-gold); }
+        .referral-card .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .referral-card .referrer { font-weight: 700; font-size: 15px; }
+        .referral-card .referred { color: var(--text-secondary); font-size: 14px; }
+        .referral-card .date { color: var(--text-secondary); font-size: 12px; }
+        .referral-card .actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .referral-card .actions button {
+            padding: 6px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .referral-card .success-btn { background: rgba(16,185,129,0.15); color: var(--success); }
+        .referral-card .success-btn:hover { background: rgba(16,185,129,0.25); }
+        .referral-card .fail-btn { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .referral-card .fail-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .leaderboard {
+            margin-top: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+        }
+        .leaderboard h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .leaderboard .entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .leaderboard .entry:last-child { border-bottom: none; }
+        .leaderboard .entry .rank { font-weight: 700; color: var(--accent-gold); width: 30px; }
+        .leaderboard .entry .name { flex: 1; }
+        .leaderboard .entry .count { color: var(--text-secondary); font-size: 13px; }
+        .leaderboard .entry .rewards { color: var(--success); font-size: 12px; }
+
+        #clientView {
+            display: none;
+            max-width: 500px;
+            margin: 40px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        #clientView .icon { font-size: 48px; margin-bottom: 12px; }
+        #clientView h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        #clientView .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+        #clientView .link-box {
+            background: var(--bg-input);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        #clientView .link-box a { color: var(--accent-gold); text-decoration: none; flex: 1; }
+        #clientView .link-box .copy-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            white-space: nowrap;
+        }
+        #clientView .link-box .copy-btn:hover { background: rgba(245,158,11,0.15); color: var(--accent-gold); border-color: var(--accent-gold); }
+        #clientView .progress-box {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+        }
+        #clientView .progress-box .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        #clientView .progress-box .progress-bar {
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        #clientView .progress-box .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-gold), #FBBF24);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        #clientView .progress-box .progress-text {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+            color: var(--accent-gold);
+        }
+        #clientView .rewards-earned { color: var(--success); font-size: 15px; margin: 8px 0; }
+
+        .not-found { text-align: center; padding: 40px 20px; }
+        .not-found .icon { font-size: 48px; margin-bottom: 12px; }
+        .not-found h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .not-found p { color: var(--text-secondary); font-size: 14px; }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .stats { grid-template-columns: 1fr 1fr; }
+            #authScreen, #clientView { padding: 24px 18px; }
+            .referral-card .top-row { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 480px) {
+            .stat-card .number { font-size: 20px; }
+            #clientView .link-box { flex-wrap: wrap; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-gold); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="/index.html">🏠 Home</a>
+                <a href="/portal.html">📦 Portal</a>
+                <a class="active" href="#">🔗 Referral</a>
+            </nav>
+        </header>
+
+        <div id="authScreen">
+            <h2>🔗 Referral System</h2>
+            <p>Enter your admin password to manage referrals.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access Referral System</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <div id="dashboard">
+
+            <div class="stats" id="statsBar">
+                <div class="stat-card"><div class="number" id="totalReferrals">0</div><div class="label">Total Referrals</div></div>
+                <div class="stat-card"><div class="number" id="pendingReferrals">0</div><div class="label">Pending</div></div>
+                <div class="stat-card"><div class="number" id="completedReferrals">0</div><div class="label">Completed</div></div>
+                <div class="stat-card"><div class="number" id="rewardsGiven">0</div><div class="label">Rewards Given</div></div>
+            </div>
+
+            <div class="referral-list" id="referralList"></div>
+
+            <div class="leaderboard" id="leaderboard">
+                <h3>🏆 Top Referrers</h3>
+                <div id="leaderboardList"></div>
+            </div>
+        </div>
+
+        <div id="clientView">
+            <div class="icon">🔗</div>
+            <h2>Your Referral Link</h2>
+            <div class="subtitle">Share this link with friends. When they buy, you earn rewards!</div>
+            <div class="link-box">
+                <a id="referralLink" href="#" target="_blank">Loading...</a>
+                <button class="copy-btn" id="copyLinkBtn">📋 Copy</button>
+            </div>
+            <div class="progress-box">
+                <div class="progress-label">
+                    <span>Your Progress</span>
+                    <span id="progressText">0/5 referrals</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+                <div class="progress-text" id="progressMessage">🎯 Complete 5 referrals to earn a free gift!</div>
+            </div>
+            <div class="rewards-earned" id="rewardsEarned">🎁 Rewards Earned: 0</div>
+            <div style="margin-top:16px;text-align:left;border-top:1px solid var(--border-color);padding-top:16px;">
+                <h4 style="font-size:14px;margin-bottom:8px;">🏆 Top Referrers</h4>
+                <div id="clientLeaderboard" style="font-size:13px;color:var(--text-secondary);"></div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Referral System · v1.0</p>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            const REFERRALS_NEEDED = 5;
+            let isAuthenticated = false;
+            let referrals = [];
+            let clients = [];
+            let gifts = [];
+
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const clientView = document.getElementById('clientView');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+
+            const referralList = document.getElementById('referralList');
+            const leaderboardList = document.getElementById('leaderboardList');
+            const totalReferrals = document.getElementById('totalReferrals');
+            const pendingReferrals = document.getElementById('pendingReferrals');
+            const completedReferrals = document.getElementById('completedReferrals');
+            const rewardsGiven = document.getElementById('rewardsGiven');
+
+            const referralLink = document.getElementById('referralLink');
+            const copyLinkBtn = document.getElementById('copyLinkBtn');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const progressMessage = document.getElementById('progressMessage');
+            const rewardsEarned = document.getElementById('rewardsEarned');
+            const clientLeaderboard = document.getElementById('clientLeaderboard');
+
+            const toast = document.getElementById('toast');
+
+            function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+            function generateLink(refCode) { return window.location.origin + window.location.pathname + '?ref=' + refCode; }
+            function formatDate(ts) { if (!ts) return 'N/A'; return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); }
+            function getQueryParam(param) { const urlParams = new URLSearchParams(window.location.search); return urlParams.get(param); }
+            function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+
+            function showToast(message, type, duration) {
+                type = type || 'info'; duration = duration || 3000;
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, duration);
+            }
+
+            function loadData() {
+                try {
+                    const refData = localStorage.getItem('tradesphere_referrals');
+                    if (refData) { referrals = JSON.parse(refData); } else { referrals = []; }
+                    const clientData = localStorage.getItem('tradesphere_clients_v3');
+                    if (clientData) { clients = JSON.parse(clientData); } else { clients = []; }
+                    const giftData = localStorage.getItem('tradesphere_gifts');
+                    if (giftData) { gifts = JSON.parse(giftData); } else { gifts = []; }
+                } catch (e) { referrals = []; clients = []; gifts = []; }
+            }
+
+            function saveReferrals() { localStorage.setItem('tradesphere_referrals', JSON.stringify(referrals)); }
+            function saveGifts() { localStorage.setItem('tradesphere_gifts', JSON.stringify(gifts)); }
+
+            function login() {
+                const password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    clientView.style.display = 'none';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderDashboard();
+                    showToast('Welcome to Referral System!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            function generateGiftForReferrer(referrerName) {
+                const newGift = {
+                    id: generateId(),
+                    name: 'Referral Reward - ' + referrerName,
+                    value: 'Free TikTok Log',
+                    message: '🎉 Congratulations! You earned this gift by referring 5 friends to Tradesphere Hub. Thank you for your support!',
+                    createdAt: Date.now(),
+                    expiryDays: 14,
+                    expiryDate: Date.now() + (14 * 86400000),
+                    redeemed: false,
+                    redeemedBy: null,
+                    redeemedAt: null
+                };
+                gifts.push(newGift);
+                saveGifts();
+                localStorage.setItem('tradesphere_reward_count_' + referrerName, (parseInt(localStorage.getItem('tradesphere_reward_count_' + referrerName) || 0) + 1));
+                return newGift;
+            }
+
+            function renderDashboard() {
+                loadData();
+                const total = referrals.length;
+                const pending = referrals.filter(r => r.status === 'pending').length;
+                const completed = referrals.filter(r => r.status === 'successful').length;
+                const rewards = completed >= REFERRALS_NEEDED ? Math.floor(completed / REFERRALS_NEEDED) : 0;
+
+                totalReferrals.textContent = total;
+                pendingReferrals.textContent = pending;
+                completedReferrals.textContent = completed;
+                rewardsGiven.textContent = rewards;
+
+                const pendingRefs = referrals.filter(r => r.status === 'pending');
+                const completedRefs = referrals.filter(r => r.status !== 'pending');
+
+                if (referrals.length === 0) {
+                    referralList.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text-secondary);"><div style="font-size:36px;margin-bottom:8px;">🔗</div><p>No referrals yet. Clients will appear here when they share their links.</p></div>';
+                } else {
+                    let html = '<h3 style="margin:16px 0 12px;font-size:16px;">📋 Pending Referrals</h3>';
+                    if (pendingRefs.length === 0) {
+                        html += '<p style="color:var(--text-secondary);font-size:13px;margin-bottom:16px;">✅ All referrals have been processed.</p>';
+                    } else {
+                        for (let i = 0; i < pendingRefs.length; i++) {
+                            const r = pendingRefs[i];
+                            html += `
+                                <div class="referral-card">
+                                    <div class="top-row">
+                                        <span class="referrer">👤 ${escapeHtml(r.referrerName)}</span>
+                                        <span class="date">📅 ${formatDate(r.createdAt)}</span>
+                                    </div>
+                                    <div class="referred">📧 Referred: ${escapeHtml(r.referredEmail || 'Unknown')}</div>
+                                    <div class="actions">
+                                        <button class="success-btn" data-id="${r.id}">✔ Mark Successful</button>
+                                        <button class="fail-btn" data-id="${r.id}">✕ Mark Failed</button>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                    if (completedRefs.length > 0) {
+                        html += '<h3 style="margin:16px 0 12px;font-size:16px;">✅ Completed Referrals</h3>';
+                        for (let i = 0; i < Math.min(completedRefs.length, 10); i++) {
+                            const r = completedRefs[i];
+                            html += `
+                                <div class="referral-card" style="border-color:rgba(16,185,129,0.2);">
+                                    <div class="top-row">
+                                        <span class="referrer">👤 ${escapeHtml(r.referrerName)}</span>
+                                        <span style="color:var(--success);font-size:13px;">✅ ${r.status === 'successful' ? 'Success' : 'Failed'}</span>
+                                    </div>
+                                    <div class="referred">📧 ${escapeHtml(r.referredEmail || 'Unknown')}</div>
+                                </div>
+                            `;
+                        }
+                    }
+                    referralList.innerHTML = html;
+                }
+
+                document.querySelectorAll('.success-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        markReferral(id, 'successful');
+                    });
+                });
+
+                document.querySelectorAll('.fail-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        markReferral(id, 'failed');
+                    });
+                });
+
+                renderLeaderboard();
+            }
+
+            function markReferral(id, status) {
+                loadData();
+                let referral = null;
+                let referrerName = '';
+                for (let i = 0; i < referrals.length; i++) {
+                    if (referrals[i].id === id) {
+                        referral = referrals[i];
+                        referrerName = referral.referrerName;
+                        break;
+                    }
+                }
+                if (!referral) { showToast('Referral not found.', 'error'); return; }
+                if (referral.status !== 'pending') { showToast('This referral has already been processed.', 'error'); return; }
+
+                referral.status = status;
+                if (status === 'successful') {
+                    const successfulCount = referrals.filter(r => r.referrerId === referral.referrerId && r.status === 'successful').length;
+                    if (successfulCount % REFERRALS_NEEDED === 0 && successfulCount > 0) {
+                        const gift = generateGiftForReferrer(referrerName);
+                        showToast('🎁 Referrer earned a free gift! Gift created in Gift Hub.', 'success');
+                    } else {
+                        const remaining = REFERRALS_NEEDED - (successfulCount % REFERRALS_NEEDED);
+                        showToast(`✅ Referral marked successful! ${remaining} more needed for reward.`, 'success');
+                    }
+                } else {
+                    showToast('❌ Referral marked as failed.', 'info');
+                }
+                saveReferrals();
+                renderDashboard();
+            }
+
+            function renderLeaderboard() {
+                loadData();
+                const refCounts = {};
+                const rewardCounts = {};
+                for (let i = 0; i < referrals.length; i++) {
+                    const r = referrals[i];
+                    if (r.status === 'successful') {
+                        const key = r.referrerId || r.referrerName;
+                        if (!refCounts[key]) refCounts[key] = 0;
+                        refCounts[key]++;
+                    }
+                }
+                for (const key in refCounts) {
+                    const count = refCounts[key];
+                    rewardCounts[key] = Math.floor(count / REFERRALS_NEEDED);
+                }
+                const sorted = Object.keys(refCounts).sort(function(a, b) { return refCounts[b] - refCounts[a]; });
+                const top5 = sorted.slice(0, 5);
+
+                if (top5.length === 0) {
+                    leaderboardList.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No referrers yet. Be the first!</p>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < top5.length; i++) {
+                    const name = top5[i];
+                    const count = refCounts[name];
+                    const rewards = rewardCounts[name] || 0;
+                    const medal = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    html += `
+                        <div class="entry">
+                            <span class="rank">${i + 1}</span>
+                            <span class="name">${medal} ${escapeHtml(name)}</span>
+                            <span class="count">${count} referrals</span>
+                            <span class="rewards">🎁 ${rewards} rewards</span>
+                        </div>
+                    `;
+                }
+                leaderboardList.innerHTML = html;
+                if (clientView.style.display === 'block') { updateClientLeaderboard(); }
+            }
+
+            function updateClientLeaderboard() {
+                loadData();
+                const refCounts = {};
+                for (let i = 0; i < referrals.length; i++) {
+                    const r = referrals[i];
+                    if (r.status === 'successful') {
+                        const key = r.referrerId || r.referrerName;
+                        if (!refCounts[key]) refCounts[key] = 0;
+                        refCounts[key]++;
+                    }
+                }
+                const sorted = Object.keys(refCounts).sort(function(a, b) { return refCounts[b] - refCounts[a]; });
+                const top5 = sorted.slice(0, 5);
+
+                if (top5.length === 0) {
+                    clientLeaderboard.innerHTML = '<p style="color:var(--text-secondary);font-size:13px;">No referrers yet. Be the first!</p>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < top5.length; i++) {
+                    const name = top5[i];
+                    const count = refCounts[name];
+                    const medal = i === 0 ? '👑' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+                    html += '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border-color);">';
+                    html += '<span>' + medal + ' ' + escapeHtml(name) + '</span>';
+                    html += '<span style="color:var(--accent-gold);">' + count + ' referrals</span>';
+                    html += '</div>';
+                }
+                clientLeaderboard.innerHTML = html;
+            }
+
+            function handleClientView() {
+                const refCode = getQueryParam('ref');
+                if (!refCode) {
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'none';
+                    clientView.style.display = 'block';
+                    clientView.innerHTML = '<div class="not-found"><div class="icon">🔍</div><h2>No Referral Found</h2><p>This referral link is invalid or has been removed.</p></div>';
+                    return;
+                }
+                loadData();
+                const referrer = clients.find(c => c.id === refCode || c.name === refCode);
+                if (!referrer) {
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'none';
+                    clientView.style.display = 'block';
+                    clientView.innerHTML = '<div class="not-found"><div class="icon">🔍</div><h2>Referrer Not Found</h2><p>This referral link is invalid.</p></div>';
+                    return;
+                }
+
+                authScreen.style.display = 'none';
+                dashboard.style.display = 'none';
+                clientView.style.display = 'block';
+
+                const link = generateLink(referrer.id);
+                referralLink.textContent = link;
+                referralLink.href = link;
+
+                const successfulRefs = referrals.filter(r => r.referrerId === referrer.id && r.status === 'successful');
+                const count = successfulRefs.length;
+                const progress = Math.min((count / REFERRALS_NEEDED) * 100, 100);
+                const remaining = Math.max(0, REFERRALS_NEEDED - count);
+
+                progressFill.style.width = progress + '%';
+                progressText.textContent = count + '/' + REFERRALS_NEEDED + ' referrals';
+
+                if (count >= REFERRALS_NEEDED) {
+                    progressMessage.textContent = '🎉 You\'ve earned a free gift! Check your rewards below.';
+                } else {
+                    progressMessage.textContent = '🎯 ' + remaining + ' more referral' + (remaining > 1 ? 's' : '') + ' to earn a free gift!';
+                }
+
+                const rewardsCount = Math.floor(count / REFERRALS_NEEDED);
+                rewardsEarned.textContent = '🎁 Rewards Earned: ' + rewardsCount;
+
+                copyLinkBtn.onclick = function() {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(link).then(function() {
+                            showToast('Link copied to clipboard!', 'success');
+                        }).catch(function() {
+                            const textarea = document.createElement('textarea');
+                            textarea.value = link;
+                            document.body.appendChild(textarea);
+                            textarea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textarea);
+                            showToast('Link copied to clipboard!', 'success');
+                        });
+                    } else {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = link;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        showToast('Link copied to clipboard!', 'success');
+                    }
+                };
+
+                updateClientLeaderboard();
+            }
+
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+
+            function init() {
+                loadData();
+                const refParam = getQueryParam('ref');
+                if (refParam) { handleClientView(); return; }
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                clientView.style.display = 'none';
+            }
+
+            window.addEventListener('popstate', function() {
+                const refParam = getQueryParam('ref');
+                if (refParam) { handleClientView(); }
+                else { authScreen.style.display = 'block'; dashboard.style.display = 'none'; clientView.style.display = 'none'; }
+            });
+
+            init();
+            console.log('🔗 Referral System loaded');
+            console.log('📊 Referrals:', referrals.length);
+            console.log('🎯 Referrals needed for reward:', REFERRALS_NEEDED);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
