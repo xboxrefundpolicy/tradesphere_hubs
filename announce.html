@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – Announcements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 800px; width:100%; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 30px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+        #dashboard { display: none; }
+        #publicView { display: block; }
+
+        .public-header { text-align:center; padding:20px 0; }
+        .public-header h1 { font-size:28px; font-weight:800; }
+        .public-header p { color:var(--text-secondary); font-size:14px; margin-top:4px; }
+
+        .announcement {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        .announcement:hover { border-color: var(--accent-gold); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .announcement .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .announcement .title { font-size: 18px; font-weight: 700; }
+        .announcement .date { color: var(--text-secondary); font-size: 13px; }
+        .announcement .badge { font-size: 10px; padding: 2px 12px; border-radius: 20px; font-weight: 600; display: inline-block; }
+        .badge.new { background: rgba(16,185,129,0.15); color: var(--success); }
+        .badge.old { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+        .announcement .content { color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin: 8px 0; }
+
+        .admin-announcement {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .admin-announcement .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .admin-announcement .title { font-weight: 700; font-size: 16px; }
+        .admin-announcement .date { color: var(--text-secondary); font-size: 12px; }
+        .admin-announcement .content { color: var(--text-secondary); font-size: 14px; margin: 6px 0; }
+        .admin-announcement .actions { display: flex; gap: 8px; }
+        .admin-announcement .actions button {
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .admin-announcement .edit-btn { background: rgba(245,158,11,0.15); color: var(--accent-gold); }
+        .admin-announcement .edit-btn:hover { background: rgba(245,158,11,0.25); }
+        .admin-announcement .delete-btn { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .admin-announcement .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .toolbar .btn {
+            padding: 8px 18px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .toolbar .add-btn { background: var(--accent-gold); color: #000; }
+        .toolbar .add-btn:hover { background: var(--accent-gold-hover); }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            max-width: 480px;
+            width: 100%;
+            padding: 28px 24px;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .modal .subtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; }
+        .modal label { display: block; font-weight: 500; font-size: 13px; margin-bottom: 4px; color: var(--text-secondary); }
+        .modal input, .modal textarea {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        .modal input:focus, .modal textarea:focus { outline: none; border-color: var(--accent-gold); }
+        .modal textarea { min-height: 100px; resize: vertical; font-family: inherit; }
+        .modal .btn-group { display: flex; gap: 10px; margin-top: 4px; }
+        .modal .btn-group .submit-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .submit-btn:hover { background: var(--accent-gold-hover); }
+        .modal .btn-group .cancel-btn {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .modal .btn-group .cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .subscribe-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 24px;
+            text-align: center;
+            margin-top: 24px;
+        }
+        .subscribe-box h3 { font-size: 18px; font-weight: 700; }
+        .subscribe-box p { color: var(--text-secondary); font-size: 14px; margin: 6px 0 16px; }
+        .subscribe-box input {
+            width: 70%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+        .subscribe-box input:focus { outline: none; border-color: var(--accent-gold); }
+        .subscribe-box .sub-btn {
+            padding: 12px 24px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.3s ease;
+            margin-left: 8px;
+        }
+        .subscribe-box .sub-btn:hover { background: var(--accent-gold-hover); }
+        .subscribe-box .sub-msg { color: var(--success); font-size: 14px; margin-top: 10px; display: none; }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        @media (max-width: 480px) {
+            #authScreen { padding: 24px 18px; }
+            .modal { padding: 20px 16px; }
+            .admin-announcement .top-row { flex-direction: column; align-items: flex-start; }
+            .subscribe-box input { width: 100%; margin-bottom: 10px; }
+            .subscribe-box .sub-btn { width: 100%; margin-left: 0; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="/index.html">🏠 Home</a>
+                <a class="active" href="#">📣 Announcements</a>
+            </nav>
+        </header>
+
+        <div id="publicView">
+            <div class="public-header">
+                <h1>📣 Announcements</h1>
+                <p>Stay updated with the latest news and updates.</p>
+            </div>
+            <div id="announcementList"></div>
+
+            <div class="subscribe-box">
+                <h3>📧 Subscribe for Updates</h3>
+                <p>Get notified when we post new announcements.</p>
+                <input type="email" id="subEmail" placeholder="Enter your email..." />
+                <button class="sub-btn" id="subBtn">Subscribe</button>
+                <div class="sub-msg" id="subMsg">✅ You've been subscribed!</div>
+            </div>
+        </div>
+
+        <div id="authScreen">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your admin password to manage announcements.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access Announcement Manager</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <div id="dashboard">
+            <div class="toolbar">
+                <button class="btn add-btn" id="addAnnounceBtn">+ New Announcement</button>
+            </div>
+            <div id="adminAnnounceList"></div>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal">
+                <h2 id="modalTitle">New Announcement</h2>
+                <div class="subtitle" id="modalSubtitle">Create a new announcement for your clients.</div>
+
+                <label>Title *</label>
+                <input type="text" id="titleInput" placeholder="Enter announcement title..." />
+
+                <label>Content *</label>
+                <textarea id="contentInput" placeholder="Write your announcement here..."></textarea>
+
+                <div class="btn-group">
+                    <button class="submit-btn" id="modalSubmitBtn">Publish</button>
+                    <button class="cancel-btn" id="modalCancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Announcements · v1.0</p>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            let announcements = [];
+            let isAuthenticated = false;
+            let editingIndex = null;
+            let subscribers = [];
+
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const publicView = document.getElementById('publicView');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+            const announcementList = document.getElementById('announcementList');
+            const adminAnnounceList = document.getElementById('adminAnnounceList');
+            const addAnnounceBtn = document.getElementById('addAnnounceBtn');
+
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalSubtitle = document.getElementById('modalSubtitle');
+            const titleInput = document.getElementById('titleInput');
+            const contentInput = document.getElementById('contentInput');
+            const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+            const subEmail = document.getElementById('subEmail');
+            const subBtn = document.getElementById('subBtn');
+            const subMsg = document.getElementById('subMsg');
+
+            const toast = document.getElementById('toast');
+
+            function showToast(message, type) {
+                type = type || 'info';
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, 3000);
+            }
+
+            function loadAnnouncements() {
+                try {
+                    const data = localStorage.getItem('tradesphere_announcements');
+                    if (data) { announcements = JSON.parse(data); } else { announcements = []; saveAnnouncements(); }
+                } catch (e) { announcements = []; }
+                return announcements;
+            }
+
+            function saveAnnouncements() { localStorage.setItem('tradesphere_announcements', JSON.stringify(announcements)); }
+
+            function loadSubscribers() {
+                try {
+                    const data = localStorage.getItem('tradesphere_announce_subscribers');
+                    if (data) { subscribers = JSON.parse(data); } else { subscribers = []; }
+                } catch (e) { subscribers = []; }
+                return subscribers;
+            }
+
+            function saveSubscribers() { localStorage.setItem('tradesphere_announce_subscribers', JSON.stringify(subscribers)); }
+
+            function formatDate(ts) {
+                if (!ts) return 'N/A';
+                return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function renderPublic() {
+                loadAnnouncements();
+                if (announcements.length === 0) {
+                    announcementList.innerHTML = '<div style="text-align:center;padding:40px 20px;color:var(--text-secondary);"><div style="font-size:36px;margin-bottom:8px;">📭</div><p>No announcements yet. Check back soon!</p></div>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = announcements.length - 1; i >= 0; i--) {
+                    const a = announcements[i];
+                    const isNew = (Date.now() - a.createdAt) < 86400000;
+                    html += `
+                        <div class="announcement">
+                            <div class="header-row">
+                                <span class="title">${escapeHtml(a.title)}</span>
+                                <span class="date">📅 ${formatDate(a.createdAt)}</span>
+                            </div>
+                            <div><span class="badge ${isNew ? 'new' : 'old'}">${isNew ? '🆕 New' : '📖 Read'}</span></div>
+                            <div class="content">${escapeHtml(a.content)}</div>
+                        </div>
+                    `;
+                }
+                announcementList.innerHTML = html;
+            }
+
+            function renderAdmin() {
+                loadAnnouncements();
+                if (announcements.length === 0) {
+                    adminAnnounceList.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text-secondary);"><div style="font-size:36px;margin-bottom:8px;">📭</div><p>No announcements yet. Click "New Announcement" to create one.</p></div>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = announcements.length - 1; i >= 0; i--) {
+                    const a = announcements[i];
+                    html += `
+                        <div class="admin-announcement">
+                            <div class="top-row">
+                                <span class="title">${escapeHtml(a.title)}</span>
+                                <span class="date">📅 ${formatDate(a.createdAt)}</span>
+                            </div>
+                            <div class="content">${escapeHtml(a.content)}</div>
+                            <div class="actions">
+                                <button class="edit-btn" data-index="${i}">✏️ Edit</button>
+                                <button class="delete-btn" data-index="${i}">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                }
+                adminAnnounceList.innerHTML = html;
+
+                document.querySelectorAll('.edit-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        openModal(index);
+                    });
+                });
+
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        if (confirm('Delete this announcement?')) {
+                            announcements.splice(index, 1);
+                            saveAnnouncements();
+                            renderAdmin();
+                            renderPublic();
+                            showToast('Announcement deleted.', 'info');
+                        }
+                    });
+                });
+            }
+
+            function login() {
+                const password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    publicView.style.display = 'none';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderAdmin();
+                    showToast('Welcome to Announcement Manager!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            function openModal(index) {
+                editingIndex = index;
+                if (index !== null && announcements[index]) {
+                    const a = announcements[index];
+                    modalTitle.textContent = 'Edit Announcement';
+                    modalSubtitle.textContent = 'Update your announcement.';
+                    titleInput.value = a.title;
+                    contentInput.value = a.content;
+                    modalSubmitBtn.textContent = 'Update';
+                } else {
+                    modalTitle.textContent = 'New Announcement';
+                    modalSubtitle.textContent = 'Create a new announcement for your clients.';
+                    titleInput.value = '';
+                    contentInput.value = '';
+                    modalSubmitBtn.textContent = 'Publish';
+                }
+                modalOverlay.classList.add('active');
+            }
+
+            function closeModal() { modalOverlay.classList.remove('active'); editingIndex = null; }
+
+            function saveAnnouncement() {
+                const title = titleInput.value.trim();
+                const content = contentInput.value.trim();
+
+                if (!title) { showToast('Please enter a title.', 'error'); return; }
+                if (!content) { showToast('Please enter content.', 'error'); return; }
+
+                if (editingIndex !== null && announcements[editingIndex]) {
+                    announcements[editingIndex].title = title;
+                    announcements[editingIndex].content = content;
+                } else {
+                    announcements.push({ title: title, content: content, createdAt: Date.now() });
+                }
+                saveAnnouncements();
+                closeModal();
+                renderAdmin();
+                renderPublic();
+                showToast('Announcement saved!', 'success');
+            }
+
+            function subscribe() {
+                const email = subEmail.value.trim();
+                if (!email || !email.includes('@')) {
+                    showToast('Please enter a valid email.', 'error');
+                    return;
+                }
+                loadSubscribers();
+                for (let i = 0; i < subscribers.length; i++) {
+                    if (subscribers[i].toLowerCase() === email.toLowerCase()) {
+                        showToast('You\'re already subscribed!', 'info');
+                        return;
+                    }
+                }
+                subscribers.push(email);
+                saveSubscribers();
+                subMsg.style.display = 'block';
+                subEmail.value = '';
+                showToast('✅ Subscribed successfully!', 'success');
+                setTimeout(function() { subMsg.style.display = 'none'; }, 4000);
+            }
+
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) { if (e.key === 'Enter') login(); });
+
+            addAnnounceBtn.addEventListener('click', function() { openModal(null); });
+            modalCancelBtn.addEventListener('click', closeModal);
+            modalSubmitBtn.addEventListener('click', saveAnnouncement);
+            modalOverlay.addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+            subBtn.addEventListener('click', subscribe);
+            subEmail.addEventListener('keydown', function(e) { if (e.key === 'Enter') subscribe(); });
+
+            function init() {
+                loadAnnouncements();
+                renderPublic();
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                publicView.style.display = 'block';
+            }
+
+            init();
+            console.log('📣 Announcements loaded, count:', announcements.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
