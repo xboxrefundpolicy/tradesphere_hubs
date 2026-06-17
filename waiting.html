@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Tradesphere Hub – Waiting List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-card: #141414;
+            --bg-input: #1E1E1E;
+            --border-color: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0A0A0;
+            --accent-gold: #F59E0B;
+            --accent-gold-hover: #D97706;
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.5);
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { max-width: 600px; width:100%; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0 16px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #FBBF24);
+            color: #000; width: 38px; height: 38px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800;
+        }
+        .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+        .logo-text span { color: var(--accent-gold); }
+        .nav { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.3s ease;
+        }
+        .nav a:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .nav a.active { color: var(--accent-gold); background: rgba(245,158,11,0.1); }
+
+        #authScreen {
+            max-width: 400px;
+            margin: 30px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+        }
+        #authScreen h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; text-align: center; }
+        #authScreen p { color: var(--text-secondary); font-size: 14px; text-align: center; margin-bottom: 20px; }
+        #authScreen input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border 0.3s ease;
+        }
+        #authScreen input:focus { outline: none; border-color: var(--accent-gold); }
+        #authScreen .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #authScreen .auth-btn:hover { background: var(--accent-gold-hover); transform: scale(1.01); }
+        #authScreen .auth-error { color: var(--danger); font-size: 13px; text-align: center; margin-top: 12px; display: none; }
+
+        #dashboard { display: none; }
+        #publicView { display: block; }
+
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-card .number { font-size: 24px; font-weight: 800; color: var(--accent-gold); }
+        .stat-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+        .email-list { max-height: 400px; overflow-y: auto; }
+        .email-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+        .email-item .email { color: var(--text-primary); }
+        .email-item .date { color: var(--text-secondary); font-size: 12px; }
+        .email-item .delete-btn {
+            background: rgba(239,68,68,0.1);
+            color: var(--danger);
+            border: none;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .email-item .delete-btn:hover { background: rgba(239,68,68,0.2); }
+
+        #publicView {
+            max-width: 450px;
+            margin: 40px auto;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 32px 28px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        #publicView .icon { font-size: 48px; margin-bottom: 12px; }
+        #publicView h2 { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+        #publicView p { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
+        #publicView input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 15px;
+            margin-bottom: 14px;
+        }
+        #publicView input:focus { outline: none; border-color: var(--accent-gold); }
+        #publicView .join-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        #publicView .join-btn:hover { background: var(--accent-gold-hover); }
+        #publicView .join-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #publicView .count { color: var(--accent-gold); font-size: 14px; margin-top: 12px; }
+        #publicView .success-msg { color: var(--success); font-size: 14px; margin-top: 12px; display: none; }
+        #publicView .error-msg { color: var(--danger); font-size: 14px; margin-top: 12px; display: none; }
+
+        .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+        .toolbar .btn {
+            padding: 8px 18px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.3s ease;
+        }
+        .toolbar .export-btn { background: var(--accent-gold); color: #000; }
+        .toolbar .export-btn:hover { background: var(--accent-gold-hover); }
+        .toolbar .clear-btn { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .toolbar .clear-btn:hover { background: rgba(239,68,68,0.2); }
+
+        .footer {
+            margin-top: 32px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+            max-width: 360px;
+        }
+        .toast.visible { transform: translateY(0); opacity: 1; }
+        .toast.success { border-color: var(--success); border-left: 4px solid var(--success); }
+        .toast.error { border-color: var(--danger); border-left: 4px solid var(--danger); }
+        .toast.info { border-color: var(--accent-gold); border-left: 4px solid var(--accent-gold); }
+
+        @media (max-width: 480px) {
+            .stats { grid-template-columns: 1fr 1fr; }
+            #authScreen, #publicView { padding: 24px 18px; }
+            .email-item { flex-wrap: wrap; gap: 6px; }
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <header class="header">
+            <div class="logo" onclick="window.location.reload()">
+                <div class="logo-icon">TS</div>
+                <div class="logo-text">Tradesphere<span>Hub</span></div>
+            </div>
+            <nav class="nav">
+                <a href="/index.html">🏠 Home</a>
+                <a class="active" href="#">📋 Waiting List</a>
+            </nav>
+        </header>
+
+        <div id="publicView">
+            <div class="icon">📋</div>
+            <h2>Join the Waiting List</h2>
+            <p>Get notified when we restock TikTok logs!</p>
+            <input type="email" id="emailInput" placeholder="Enter your email..." />
+            <button class="join-btn" id="joinBtn">📋 Join Waiting List</button>
+            <div class="count" id="countDisplay">👥 0 people are waiting</div>
+            <div class="success-msg" id="successMsg">✅ You've been added to the waiting list!</div>
+            <div class="error-msg" id="errorMsg">⚠️ Please enter a valid email address.</div>
+        </div>
+
+        <div id="authScreen">
+            <h2>🔐 Admin Access</h2>
+            <p>Enter your admin password to manage the waiting list.</p>
+            <input type="password" id="adminPassword" placeholder="Enter admin password..." autofocus />
+            <button class="auth-btn" id="authBtn">Access Waiting List</button>
+            <div class="auth-error" id="authError">Incorrect password. Please try again.</div>
+        </div>
+
+        <div id="dashboard">
+            <div class="stats">
+                <div class="stat-card"><div class="number" id="totalCount">0</div><div class="label">Total Waitlist</div></div>
+                <div class="stat-card"><div class="number" id="todayCount">0</div><div class="label">Joined Today</div></div>
+            </div>
+            <div class="toolbar">
+                <button class="btn export-btn" id="exportBtn">📤 Export CSV</button>
+                <button class="btn clear-btn" id="clearAllBtn">🗑️ Clear All</button>
+            </div>
+            <div class="email-list" id="emailList"></div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Tradesphere Hub · Waiting List · v1.0</p>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const ADMIN_PASSWORD = 'admindelight200515$$';
+            let waitlist = [];
+            let isAuthenticated = false;
+
+            const publicView = document.getElementById('publicView');
+            const authScreen = document.getElementById('authScreen');
+            const dashboard = document.getElementById('dashboard');
+            const emailInput = document.getElementById('emailInput');
+            const joinBtn = document.getElementById('joinBtn');
+            const countDisplay = document.getElementById('countDisplay');
+            const successMsg = document.getElementById('successMsg');
+            const errorMsg = document.getElementById('errorMsg');
+            const adminPassword = document.getElementById('adminPassword');
+            const authBtn = document.getElementById('authBtn');
+            const authError = document.getElementById('authError');
+            const totalCount = document.getElementById('totalCount');
+            const todayCount = document.getElementById('todayCount');
+            const emailList = document.getElementById('emailList');
+            const exportBtn = document.getElementById('exportBtn');
+            const clearAllBtn = document.getElementById('clearAllBtn');
+            const toast = document.getElementById('toast');
+
+            function showToast(message, type) {
+                type = type || 'info';
+                toast.textContent = message;
+                toast.className = 'toast ' + type + ' visible';
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(function() { toast.classList.remove('visible'); }, 3000);
+            }
+
+            function loadWaitlist() {
+                try {
+                    const data = localStorage.getItem('tradesphere_waiting_list');
+                    if (data) { waitlist = JSON.parse(data); } else { waitlist = []; }
+                } catch (e) { waitlist = []; }
+                return waitlist;
+            }
+
+            function saveWaitlist() { localStorage.setItem('tradesphere_waiting_list', JSON.stringify(waitlist)); }
+
+            function formatDate(ts) {
+                if (!ts) return 'N/A';
+                return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
+            function updatePublicCount() {
+                loadWaitlist();
+                countDisplay.textContent = '👥 ' + waitlist.length + ' people are waiting';
+            }
+
+            function renderDashboard() {
+                loadWaitlist();
+                totalCount.textContent = waitlist.length;
+                const today = new Date().toDateString();
+                let todayCountNum = 0;
+                for (let i = 0; i < waitlist.length; i++) {
+                    if (new Date(waitlist[i].joinedAt).toDateString() === today) { todayCountNum++; }
+                }
+                todayCount.textContent = todayCountNum;
+
+                if (waitlist.length === 0) {
+                    emailList.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text-secondary);"><div style="font-size:36px;margin-bottom:8px;">📭</div><p>No one on the waiting list yet.</p></div>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < waitlist.length; i++) {
+                    const item = waitlist[i];
+                    html += `
+                        <div class="email-item">
+                            <span class="email">📧 ${escapeHtml(item.email)}</span>
+                            <span class="date">📅 ${formatDate(item.joinedAt)}</span>
+                            <button class="delete-btn" data-index="${i}">✕</button>
+                        </div>
+                    `;
+                }
+                emailList.innerHTML = html;
+
+                document.querySelectorAll('.delete-btn').forEach(function(btn) {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.dataset.index);
+                        if (confirm('Remove this email from the waiting list?')) {
+                            waitlist.splice(index, 1);
+                            saveWaitlist();
+                            renderDashboard();
+                            showToast('Email removed.', 'info');
+                        }
+                    });
+                });
+            }
+
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            function login() {
+                const password = adminPassword.value.trim();
+                if (password === ADMIN_PASSWORD) {
+                    isAuthenticated = true;
+                    authScreen.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    publicView.style.display = 'none';
+                    authError.style.display = 'none';
+                    adminPassword.value = '';
+                    renderDashboard();
+                    showToast('Welcome to Waiting List Admin!', 'success');
+                } else {
+                    authError.style.display = 'block';
+                    setTimeout(function() { authError.style.display = 'none'; }, 3000);
+                }
+            }
+
+            joinBtn.addEventListener('click', function() {
+                const email = emailInput.value.trim();
+                if (!email || !email.includes('@')) {
+                    errorMsg.style.display = 'block';
+                    successMsg.style.display = 'none';
+                    setTimeout(function() { errorMsg.style.display = 'none'; }, 3000);
+                    return;
+                }
+                loadWaitlist();
+                for (let i = 0; i < waitlist.length; i++) {
+                    if (waitlist[i].email.toLowerCase() === email.toLowerCase()) {
+                        errorMsg.textContent = '⚠️ This email is already on the waiting list.';
+                        errorMsg.style.display = 'block';
+                        successMsg.style.display = 'none';
+                        setTimeout(function() { errorMsg.style.display = 'none'; }, 3000);
+                        return;
+                    }
+                }
+                waitlist.push({ email: email, joinedAt: Date.now() });
+                saveWaitlist();
+                updatePublicCount();
+                emailInput.value = '';
+                successMsg.style.display = 'block';
+                errorMsg.style.display = 'none';
+                showToast('✅ You\'ve been added to the waiting list!', 'success');
+                setTimeout(function() { successMsg.style.display = 'none'; }, 4000);
+            });
+
+            emailInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') joinBtn.click();
+            });
+
+            authBtn.addEventListener('click', login);
+            adminPassword.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') login();
+            });
+
+            exportBtn.addEventListener('click', function() {
+                loadWaitlist();
+                if (waitlist.length === 0) {
+                    showToast('No emails to export.', 'error');
+                    return;
+                }
+                let csv = 'Email,Joined Date\n';
+                for (let i = 0; i < waitlist.length; i++) {
+                    csv += '"' + waitlist[i].email + '","' + formatDate(waitlist[i].joinedAt) + '"\n';
+                }
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'waiting_list_' + new Date().toISOString().slice(0, 10) + '.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📤 CSV exported!', 'success');
+            });
+
+            clearAllBtn.addEventListener('click', function() {
+                if (confirm('Delete all emails from the waiting list?')) {
+                    waitlist = [];
+                    saveWaitlist();
+                    renderDashboard();
+                    updatePublicCount();
+                    showToast('Waiting list cleared.', 'info');
+                }
+            });
+
+            function init() {
+                loadWaitlist();
+                updatePublicCount();
+                authScreen.style.display = 'block';
+                dashboard.style.display = 'none';
+                publicView.style.display = 'block';
+            }
+
+            init();
+            console.log('📋 Waiting List loaded, count:', waitlist.length);
+            console.log('🔑 Admin password: admindelight200515$$');
+
+        })();
+    </script>
+
+</body>
+</html>
